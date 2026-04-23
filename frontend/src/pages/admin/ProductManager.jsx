@@ -1,0 +1,117 @@
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
+import { Plus, Search } from 'lucide-react';
+import { getProducts } from '../../api/api';
+import ProductFilters from '../../components/admin/ProductFilters';
+import ProductTable from '../../components/admin/ProductTable';
+import ProductDetailPanel from '../../components/admin/ProductDetailPanel';
+import ProductFormal from '../../components/admin/ProductFormal';
+import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
+
+const getStockStatus = (variants) => {
+  if (!variants || variants.length === 0) return { label: 'No Stock', color: 'bg-black/10 text-black' };
+  const total = variants.reduce((acc, v) => acc + v.stock, 0);
+  if (total === 0) return { label: 'Out of Stock', color: 'bg-red-500/10 text-red-600' };
+  if (total < 10) return { label: 'Low Stock', color: 'bg-orange-500/10 text-orange-600' };
+  return { label: 'In Stock', color: 'bg-green-500/10 text-green-600' };
+};
+
+const getTotalStock = (variants) => {
+  if (!variants) return 0;
+  return variants.reduce((acc, v) => acc + v.stock, 0);
+};
+
+const getBasePrice = (variants) => {
+  if (!variants || variants.length === 0) return 'N/A';
+  return `Rp ${Number(variants[0].price).toLocaleString('id-ID')}`;
+};
+
+export default function ProductManager() {
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const { data: productsData, isLoading } = useQuery({
+    queryKey: ['admin_products'],
+    queryFn: () => getProducts().then(res => res.data),
+  });
+
+  const products = productsData?.results || productsData || [];
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editProduct, setEditProduct] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  return (
+    <div className="flex h-full gap-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex-1 bg-white rounded-[2rem] p-8 shadow-sm flex flex-col min-h-0"
+      >
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-black tracking-tighter">Products</h1>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40" />
+              <input
+                type="text"
+                placeholder="Search products..."
+                className="bg-brand-bg rounded-full py-2.5 pl-12 pr-4 text-sm font-medium outline-none border border-black/5 focus:border-black/20 w-64 transition-colors"
+              />
+            </div>
+            <button className="bg-black text-brand-bg px-6 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-2 hover:bg-black/80 transition-colors"
+              onClick={() => setIsModalOpen(true)}>
+              <Plus size={16} /> Add
+            </button>
+          </div>
+        </div>
+
+        <ProductFilters />
+
+        <ProductTable
+          products={products}
+          isLoading={isLoading}
+          selectedProductId={selectedProduct?.id}
+          onRowClick={setSelectedProduct}
+          onEdit={(prod) => setEditProduct(prod)}
+          onDelete={(prod) => setDeleteTarget(prod)}
+          getStockStatus={getStockStatus}
+          getTotalStock={getTotalStock}
+          getBasePrice={getBasePrice}
+        />
+      </motion.div>
+
+      <AnimatePresence>
+        {selectedProduct && (
+          <ProductDetailPanel
+            product={selectedProduct}
+            onClose={() => setSelectedProduct(null)}
+            getBasePrice={getBasePrice}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {(isModalOpen || editProduct) && (
+          <ProductFormal
+            product={editProduct || null}
+            onClose={() => {
+              setIsModalOpen(false);
+              setEditProduct(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {deleteTarget && (
+          <DeleteConfirmModal
+            product={deleteTarget}
+            onClose={() => setDeleteTarget(null)}
+            onDeleted={() => {
+              if (selectedProduct?.id === deleteTarget.id) setSelectedProduct(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
