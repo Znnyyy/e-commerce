@@ -82,3 +82,17 @@ class OrderViewSet(viewsets.ModelViewSet):
         cart.items.all().delete()
 
         return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['patch'], permission_classes=[permissions.IsAdminUser])
+    def update_status(self, request, pk=None):
+        order = self.get_object()
+        new_status = request.data.get('status')
+        valid_statuses = [s[0] for s in Order.STATUS_CHOICES]
+        if new_status not in valid_statuses:
+            return Response(
+                {"error": f"Invalid status. Choose from: {', '.join(valid_statuses)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        order.status = new_status
+        order.save()
+        return Response(OrderSerializer(order, context={'request': request}).data)

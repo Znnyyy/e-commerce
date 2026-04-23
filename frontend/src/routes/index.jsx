@@ -8,6 +8,7 @@ import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import ProductManager from "../pages/admin/ProductManager";
+import OrderManager from "../pages/admin/OrderManager";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import Checkout from "../pages/cart/Checkout";
 import Success from "../pages/cart/Success";
@@ -70,6 +71,10 @@ export const router = createBrowserRouter([
           {
             path: "products",
             element: <ProductManager />
+          },
+          {
+            path: "orders",
+            element: <OrderManager />
           }
         ]
       }

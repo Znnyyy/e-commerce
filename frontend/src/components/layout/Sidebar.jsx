@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, Settings, LogOut, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Settings, LogOut } from 'lucide-react';
 import useAuthStore from '../../store/useAuthStore';
 
 export default function Sidebar() {
@@ -13,6 +13,7 @@ export default function Sidebar() {
   const links = [
     { name: 'Analytics', path: '/admin', icon: LayoutDashboard, show: isAdmin },
     { name: 'Products', path: '/admin/products', icon: Package, show: isStaff },
+    { name: 'Orders', path: '/admin/orders', icon: ShoppingBag, show: isStaff },
     { name: 'Settings', path: '/admin/settings', icon: Settings, show: isAdmin },
   ];
 

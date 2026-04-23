@@ -80,7 +80,7 @@ export default function Checkout() {
                 value={formData.shipping_name}
                 onChange={handleChange}
                 className="w-full border border-black/20 px-4 py-3 focus:outline-none focus:border-black transition-colors"
-                placeholder="John Doe"
+                placeholder="Fill Your Name"
               />
             </div>
             <div>
@@ -92,7 +92,7 @@ export default function Checkout() {
                 value={formData.shipping_phone}
                 onChange={handleChange}
                 className="w-full border border-black/20 px-4 py-3 focus:outline-none focus:border-black transition-colors"
-                placeholder="+62 812 3456 7890"
+                placeholder="Fill Your Number Phone"
               />
             </div>
             <div>
@@ -104,7 +104,7 @@ export default function Checkout() {
                 value={formData.shipping_city}
                 onChange={handleChange}
                 className="w-full border border-black/20 px-4 py-3 focus:outline-none focus:border-black transition-colors"
-                placeholder="Jakarta"
+                placeholder="Fill Your City"
               />
             </div>
             <div>
@@ -116,7 +116,7 @@ export default function Checkout() {
                 value={formData.shipping_address}
                 onChange={handleChange}
                 className="w-full border border-black/20 px-4 py-3 focus:outline-none focus:border-black transition-colors resize-none"
-                placeholder="Jl. Sudirman No. 123..."
+                placeholder="Fill Your Address"
               />
             </div>
             <button
