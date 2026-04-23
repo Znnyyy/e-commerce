@@ -9,6 +9,8 @@ import RegisterPage from "../pages/auth/RegisterPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import ProductManager from "../pages/admin/ProductManager";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
+import Checkout from "../pages/cart/Checkout";
+import Success from "../pages/cart/Success";
 
 export const router = createBrowserRouter([
   {
@@ -34,6 +36,14 @@ export const router = createBrowserRouter([
           {
             path: "/product/:id",
             element: <ProductDetail />
+          },
+          {
+            path: "/checkout",
+            element: <Checkout />
+          },
+          {
+            path: "/checkout/success",
+            element: <Success />
           }
         ],
       }
