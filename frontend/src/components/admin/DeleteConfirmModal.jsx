@@ -29,7 +29,7 @@ export default function DeleteConfirmModal({ product, onClose, onDeleted }) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.94, y: 12 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
-          className="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl text-center"
+          className="bg-white rounded-4xl p-8 w-full max-w-sm shadow-2xl text-center"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Icon */}

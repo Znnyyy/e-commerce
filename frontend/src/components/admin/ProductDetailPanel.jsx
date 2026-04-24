@@ -85,7 +85,7 @@ export default function ProductDetailPanel({ product, onClose, getBasePrice }) {
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: 20 }}
-        className="w-80 bg-white rounded-[2rem] p-6 flex flex-col shadow-sm relative"
+        className="w-80 bg-white rounded-4xl p-6 flex flex-col shadow-sm relative"
       >
         <button
           onClick={onClose}

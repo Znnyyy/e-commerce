@@ -34,3 +34,6 @@ export const updateCartItem = (itemId, quantity) =>
 export const removeCartItem = (itemId) =>
   api.delete(`/cart/remove/${itemId}/`);
 export const clearCart = () => api.delete('/cart/clear/');
+
+// Orders
+export const getMyOrders = () => api.get('/orders/');

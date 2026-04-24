@@ -70,7 +70,7 @@ export default function CartDrawer() {
                       key={item.id}
                       className="flex gap-4 py-4 border-b border-black/10"
                     >
-                      <div className="w-24 h-24 bg-[#f4f4f4] flex-shrink-0 rounded-lg overflow-hidden">
+                      <div className="w-24 h-24 bg-[#f4f4f4] shrink-0 rounded-lg overflow-hidden">
                         {item.variant.primary_image ? (
                           <img
                             src={item.variant.primary_image}

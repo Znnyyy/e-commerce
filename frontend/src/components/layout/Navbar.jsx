@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, User, ShoppingCart, LogOut, Settings } from "lucide-react";
+import { Search, User, ShoppingCart } from "lucide-react";
 import useAuthStore from "../../store/useAuthStore";
 import useCartStore from "../../store/useCartStore";
 
 export default function Navbar() {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const { cart, toggleCart, loadCart } = useCartStore();
 
   useEffect(() => {
@@ -16,9 +16,9 @@ export default function Navbar() {
 
   const itemCount = cart?.item_count || 0;
 
+
   return (
     <nav className="flex items-center justify-between px-8 py-6 w-full border-b border-black/10">
-
       <div className="flex items-center">
         <Link to="/" className="font-black text-2xl tracking-tighter uppercase hover:opacity-80 transition-opacity">
           SNEAKERS.
@@ -46,16 +46,9 @@ export default function Navbar() {
         </button>
 
         {isAuthenticated ? (
-          <div className="flex items-center space-x-4">
-            {user?.is_staff && (
-              <Link to="/admin" className="p-1 hover:opacity-60 transition-opacity cursor-pointer">
-                <Settings size={22} className="text-black" />
-              </Link>
-            )}
-            <button onClick={logout} className="p-1 hover:opacity-60 transition-opacity cursor-pointer">
-              <LogOut size={22} className="text-black" />
-            </button>
-          </div>
+          <Link to="/account" className="p-1 hover:opacity-60 transition-opacity cursor-pointer">
+            <User size={22} className="text-black" />
+          </Link>
         ) : (
           <Link to="/login" className="p-1 hover:opacity-60 transition-opacity cursor-pointer">
             <User size={22} className="text-black" />
@@ -77,4 +70,3 @@ export default function Navbar() {
     </nav>
   );
 }
-

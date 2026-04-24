@@ -4,11 +4,12 @@ from apps.shop.models import ProductVariant, ProductImage
 
 class OrderVariantSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name', read_only=True)
+    product_id = serializers.ReadOnlyField(source='product.id')
     primary_image = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductVariant
-        fields = ['id', 'sku', 'size', 'color', 'price', 'stock', 'product_name', 'primary_image']
+        fields = ['id', 'sku', 'size', 'color', 'price', 'stock', 'product_name', 'product_id', 'primary_image']
 
     def get_primary_image(self, obj):
         primary = obj.product.images.filter(is_primary=True).first()

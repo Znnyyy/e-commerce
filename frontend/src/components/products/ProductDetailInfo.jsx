@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ShoppingCart, Star, ArrowLeft } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { ShoppingCart, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { formatRupiah } from "../../utils/format";
 import useCartStore from "../../store/useCartStore";
 import useAuthStore from "../../store/useAuthStore";
@@ -96,11 +96,11 @@ export default function ProductDetailInfo({ product, selectedVariantId, setSelec
         className="mb-10"
       >
         <div className="flex items-center gap-1 mb-4 text-black">
-          < Star fill="currentColor" size={18} />
-          < Star fill="currentColor" size={18} />
-          < Star fill="currentColor" size={18} />
-          < Star fill="currentColor" size={18} />
-          < Star size={18} className="opacity-30" />
+          <Star fill="currentColor" size={18} />
+          <Star fill="currentColor" size={18} />
+          <Star fill="currentColor" size={18} />
+          <Star fill="currentColor" size={18} />
+          <Star size={18} className="opacity-30" />
           <span className="opacity-60 text-sm ml-2 font-medium">(128 Reviews)</span>
         </div>
 
