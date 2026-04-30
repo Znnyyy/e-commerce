@@ -57,9 +57,10 @@ export default function ProductDetailInfo({ product, selectedVariantId, setSelec
     try {
       await addItem(selectedVariant.id, 1);
       setAddedFeedback(true);
+      import('react-hot-toast').then(({ default: toast }) => toast.success('Added to cart'));
       setTimeout(() => setAddedFeedback(false), 2000);
     } catch (err) {
-      alert(err.message);
+      import('react-hot-toast').then(({ default: toast }) => toast.error(err.message));
     }
   };
 

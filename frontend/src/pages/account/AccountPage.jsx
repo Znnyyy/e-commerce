@@ -7,6 +7,7 @@ import { getMyOrders } from "../../api/api";
 import { formatRupiah } from "../../utils/format";
 import StatBox from "../../components/account/StatBox";
 import OrderRow from "../../components/account/OrderRow";
+import OrderRowSkeleton from "../../components/ui/skeletons/OrderRowSkeleton";
 
 export default function AccountPage() {
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -154,12 +155,12 @@ export default function AccountPage() {
             ))}
           </div>
 
-          <div className="min-h-[300px]">
+          <div className="h-[300px] overflow-y-auto pr-2 no-scrollbar">
             {activeTab === 'orders' && (
               loadingOrders ? (
                 <div className="space-y-4">
                   {[1, 2, 3].map(i => (
-                    <div key={i} className="animate-pulse h-24 bg-black/5 rounded-2xl" />
+                    <OrderRowSkeleton key={i} />
                   ))}
                 </div>
               ) : orders.length === 0 ? (

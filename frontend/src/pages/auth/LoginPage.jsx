@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/useAuthStore';
@@ -13,6 +13,12 @@ export default function LoginPage() {
   const location = useLocation();
 
   const from = location.state?.from?.pathname || '/';
+
+  useEffect(() => {
+    if (error) {
+      import('react-hot-toast').then(({ default: toast }) => toast.error(error));
+    }
+  }, [error]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,11 +55,7 @@ export default function LoginPage() {
           <h2 className="text-4xl font-black uppercase tracking-tighter mb-2">Login</h2>
           <p className="opacity-60 mb-8">Sign in to your account.</p>
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500 text-red-500 p-4 mb-6 text-sm font-medium">
-              {error}
-            </div>
-          )}
+
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>

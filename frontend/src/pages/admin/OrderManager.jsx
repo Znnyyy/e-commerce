@@ -5,6 +5,7 @@ import api from '../../api/axios';
 import { formatRupiah } from '../../utils/format';
 import StatusBadge, { STATUS_CONFIG } from '../../components/admin/orders/StatusBadge';
 import OrderDetailPanel from '../../components/admin/orders/OrderDetailPanel';
+import TableRowSkeleton from '../../components/ui/skeletons/TableRowSkeleton';
 
 const STATUS_OPTIONS = ['all', 'pending', 'paid', 'shipped', 'failed'];
 
@@ -101,13 +102,7 @@ export default function OrderManager() {
             <tbody>
               {loading ? (
                 [1,2,3,4,5].map(i => (
-                  <tr key={i} className="animate-pulse">
-                    {[1,2,3,4,5,6,7].map(j => (
-                      <td key={j} className="p-4 border-b border-black/5">
-                        <div className="h-4 bg-black/10 rounded w-3/4" />
-                      </td>
-                    ))}
-                  </tr>
+                  <TableRowSkeleton key={i} columns={7} />
                 ))
               ) : filtered.length === 0 ? (
                 <tr>

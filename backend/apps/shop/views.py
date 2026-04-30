@@ -18,7 +18,7 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
 class ProductImageViewSet(viewsets.ModelViewSet):
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
-    parser_classes = [MultiPartParser, FormParser]
+    # parser_classes dihapus karena sekarang hanya menerima JSON (URL string)
 
     @action(detail=True, methods=['post'])
     def set_primary(self, request, pk=None):

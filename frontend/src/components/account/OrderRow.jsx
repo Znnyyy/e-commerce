@@ -56,7 +56,7 @@ export const OrderRow = ({ order }) => {
             transition={{ duration: 0.2 }}
             className="overflow-hidden border-t border-black/5 bg-brand-bg/30"
           >
-            <div className="p-4 sm:p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-4 max-h-[350px] overflow-y-auto overflow-x-hidden no-scrollbar">
               {order.items?.map((item, idx) => (
                 <div key={item.id} className={`flex items-center gap-4 ${idx !== 0 ? 'pt-4 border-t border-black/5' : ''}`}>
                   <div className="w-16 h-16 bg-white rounded-xl border border-black/5 flex items-center justify-center p-1.5 shrink-0">

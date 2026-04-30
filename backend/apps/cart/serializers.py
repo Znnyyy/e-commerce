@@ -17,7 +17,9 @@ class VariantInCartSerializer(serializers.ModelSerializer):
             primary = obj.product.images.first()
         if primary:
             request = self.context.get('request')
-            return request.build_absolute_uri(primary.image.url) if request else primary.image.url
+            if primary.image.startswith('http'):
+                return primary.image
+            return request.build_absolute_uri(primary.image) if request else primary.image
         return None
 
 class CartItemSerializer(serializers.ModelSerializer):

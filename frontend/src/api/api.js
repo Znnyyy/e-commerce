@@ -13,13 +13,11 @@ export const updateVariant = (id, data) => api.put(`/product-variants/${id}/`, d
 export const deleteVariant = (id) => api.delete(`/product-variants/${id}/`);
 
 // Product Images
-export const uploadProductImage = (productId, file, isPrimary = false) => {
-  const formData = new FormData();
-  formData.append('product', productId);
-  formData.append('image', file);
-  formData.append('is_primary', isPrimary);
-  return api.post('/product-images/', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+export const uploadProductImage = (productId, imageUrl, isPrimary = false) => {
+  return api.post('/product-images/', {
+    product: productId,
+    image: imageUrl,
+    is_primary: isPrimary
   });
 };
 export const deleteProductImage = (id) => api.delete(`/product-images/${id}/`);

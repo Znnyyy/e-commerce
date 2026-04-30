@@ -10,6 +10,7 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import ProductManager from "../pages/admin/ProductManager";
 import OrderManager from "../pages/admin/OrderManager";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
+import CartRoute from "../components/auth/CartRoute";
 import Checkout from "../pages/cart/Checkout";
 import Success from "../pages/cart/Success";
 import AccountPage from "../pages/account/AccountPage";
@@ -41,7 +42,10 @@ export const router = createBrowserRouter([
           },
           {
             path: "/checkout",
-            element: <Checkout />
+            element: <CartRoute />,
+            children: [
+              { index: true, element: <Checkout /> }
+            ]
           },
           {
             path: "/checkout/success",

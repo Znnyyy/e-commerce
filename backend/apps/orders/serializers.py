@@ -16,8 +16,15 @@ class OrderVariantSerializer(serializers.ModelSerializer):
         if not primary:
             primary = obj.product.images.first()
         if primary and primary.image:
-            request = self.context.get('request')
-            return request.build_absolute_uri(primary.image.url) if request else primary.image.url
+            image = primary.image
+            # Cloudinary menyimpan sebagai string URL langsung
+            if isinstance(image, str):
+                return image
+            # Fallback untuk ImageField lama
+            try:
+                return image.url
+            except Exception:
+                return str(image)
         return None
 
 class OrderItemSerializer(serializers.ModelSerializer):

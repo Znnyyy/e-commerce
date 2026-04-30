@@ -5,7 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ProductDetailImage from '../../components/products/ProductDetailImage';
 import ProductDetailInfo from '../../components/products/ProductDetailInfo';
-import LoadingSpinner from '../../components/shop/LoadingSpinner';
+import ProductDetailSkeleton from '../../components/ui/skeletons/ProductDetailSkeleton';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -14,7 +14,7 @@ export default function ProductDetail() {
   const { product, loading: isLoading, error: isError } = useProductDetail(id);
 
   if (isLoading) {
-    return <LoadingSpinner fullPage />;
+    return <ProductDetailSkeleton />;
   }
 
   if (isError || !product) {

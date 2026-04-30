@@ -1,5 +1,6 @@
 import { Edit3, Trash2, PackageOpen } from 'lucide-react';
 import { getImageUrl } from '../../api/axios';
+import TableRowSkeleton from '../ui/skeletons/TableRowSkeleton';
 
 export default function ProductTable({ products, isLoading, selectedProductId, onRowClick, onEdit, onDelete, getStockStatus, getTotalStock, getBasePrice }) {
   return (
@@ -18,14 +19,7 @@ export default function ProductTable({ products, isLoading, selectedProductId, o
         <tbody>
           {isLoading ? (
             [1, 2, 3, 4, 5].map(i => (
-              <tr key={i} className="animate-pulse">
-                <td className="p-4 border-b border-black/5"><div className="h-4 bg-black/10 rounded w-3/4"></div></td>
-                <td className="p-4 border-b border-black/5"><div className="h-4 bg-black/10 rounded w-1/2"></div></td>
-                <td className="p-4 border-b border-black/5"><div className="h-6 bg-black/10 rounded-full w-20"></div></td>
-                <td className="p-4 border-b border-black/5"><div className="h-4 bg-black/10 rounded w-8"></div></td>
-                <td className="p-4 border-b border-black/5"><div className="h-4 bg-black/10 rounded w-24"></div></td>
-                <td className="p-4 border-b border-black/5"></td>
-              </tr>
+              <TableRowSkeleton key={i} columns={6} />
             ))
           ) : products.length === 0 ? (
             <tr>

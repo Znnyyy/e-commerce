@@ -119,7 +119,31 @@ export default function ProductFormal({ product = null, onClose }) {
       const productId = isEdit ? product.id : productRes.data.id;
 
       for (const f of newFiles) {
-        await uploadProductImage(productId, f.file, f.isPrimary);
+        // 1. Upload ke Cloudinary terlebih dahulu
+        const formData = new FormData();
+        formData.append('file', f.file);
+        // Ambil dari .env (gunakan nama cloud dan preset Anda)
+        const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'demo';
+        const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'docs_upload_example_us_preset';
+        formData.append('upload_preset', uploadPreset);
+        
+        try {
+          const cloudinaryRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+            method: 'POST',
+            body: formData,
+          });
+          const cloudinaryData = await cloudinaryRes.json();
+          
+          if (cloudinaryData.secure_url) {
+            // 2. Jika berhasil, simpan link URL-nya ke backend Django kita
+            await uploadProductImage(productId, cloudinaryData.secure_url, f.isPrimary);
+          } else {
+            throw new Error('Gagal upload ke Cloudinary');
+          }
+        } catch (uploadErr) {
+          console.error("Cloudinary upload failed:", uploadErr);
+          throw new Error('Gagal mengunggah beberapa gambar ke Cloudinary.');
+        }
       }
 
       if (isEdit && primaryExistingId) {
@@ -148,9 +172,12 @@ export default function ProductFormal({ product = null, onClose }) {
       }
 
       queryClient.invalidateQueries(['admin_products']);
+      import('react-hot-toast').then(({ default: toast }) => toast.success(isEdit ? 'Product updated successfully' : 'Product created successfully'));
       onClose();
     } catch (err) {
-      setError(err?.response?.data?.detail || 'Terjadi kesalahan. Coba lagi.');
+      const errMsg = err?.response?.data?.detail || 'Terjadi kesalahan. Coba lagi.';
+      setError(errMsg);
+      import('react-hot-toast').then(({ default: toast }) => toast.error(errMsg));
     }
   };
 
@@ -333,9 +360,7 @@ export default function ProductFormal({ product = null, onClose }) {
               </div>
             </section>
 
-            {error && (
-              <p className="text-xs text-red-500 font-bold bg-red-50 px-4 py-3 rounded-2xl">{error}</p>
-            )}
+
 
             <div className="flex gap-3">
               <button

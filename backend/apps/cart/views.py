@@ -39,10 +39,12 @@ class CartViewSet(viewsets.ViewSet):
             return Response({'error': 'Not enough stock'}, status=400)
 
         item, created = CartItem.objects.get_or_create(cart=cart, variant=variant)
-        if not created:
-            item.quantity += quantity
-        else:
-            item.quantity = quantity
+        new_quantity = item.quantity + quantity if not created else quantity
+        
+        if new_quantity > variant.stock:
+            return Response({'error': f'Stok tidak mencukupi. Hanya tersedia {variant.stock} item.'}, status=400)
+            
+        item.quantity = new_quantity
         item.save()
 
         serializer = CartSerializer(cart, context={'request': request})
