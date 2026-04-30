@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, PackageOpen, ChevronRight } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../../api/axios';
 import { formatRupiah } from '../../utils/format';
 import StatusBadge, { STATUS_CONFIG } from '../../components/admin/orders/StatusBadge';
@@ -49,11 +50,10 @@ export default function OrderManager() {
       const res = await api.post(`/orders/${orderId}/sync_midtrans/`);
       setOrders(prev => prev.map(o => o.id === orderId ? res.data : o));
       if (selectedOrder?.id === orderId) setSelectedOrder(res.data);
-      import('react-hot-toast').then(({ default: toast }) => toast.success('Status synced with Midtrans'));
+      toast.success('Status synced with Midtrans');
     } catch (err) {
-      console.error('Failed to sync midtrans', err);
       const errMsg = err.response?.data?.error || 'Failed to sync with Midtrans';
-      import('react-hot-toast').then(({ default: toast }) => toast.error(errMsg));
+      toast.error(errMsg);
     } finally {
       setUpdatingId(null);
     }

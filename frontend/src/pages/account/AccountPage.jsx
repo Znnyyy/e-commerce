@@ -1,24 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, Link } from "react-router-dom";
-import { User, LogOut, LayoutDashboard, Mail, ShieldCheck, Package, ShoppingBag, Edit2, Calendar, CreditCard, Box } from "lucide-react";
-import { motion } from "framer-motion";
+import { LogOut, LayoutDashboard, ShoppingBag } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import useAuthStore from "../../store/useAuthStore";
 import { getMyOrders } from "../../api/api";
 import { formatRupiah } from "../../utils/format";
-import StatBox from "../../components/account/StatBox";
-import OrderRow from "../../components/account/OrderRow";
-import OrderRowSkeleton from "../../components/ui/skeletons/OrderRowSkeleton";
+import AccountHeader from "../../components/account/AccountHeader";
+import AccountTabs from "../../components/account/AccountTabs";
+import EditProfileModal from "../../components/account/EditProfileModal";
 
 export default function AccountPage() {
   const { user, isAuthenticated, logout } = useAuthStore();
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [activeTab, setActiveTab] = useState('orders');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchOrders();
-    }
+    if (isAuthenticated) fetchOrders();
   }, [isAuthenticated]);
 
   const fetchOrders = async () => {
@@ -33,9 +32,7 @@ export default function AccountPage() {
     }
   };
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   const totalSpent = orders.reduce((sum, o) => sum + Number(o.total_amount), 0);
   const totalItems = orders.reduce((sum, o) => sum + (o.items?.length || 0), 0);
@@ -49,43 +46,13 @@ export default function AccountPage() {
 
       <div className="mx-auto px-4 sm:px-6 lg:px-8 -mt-16 md:-mt-24 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white rounded-lg p-6 md:p-8 shadow-sm border border-black/5 relative">
-            <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 relative z-10">
-              <div className="w-28 h-28 sm:w-32 sm:h-32 bg-white rounded-full p-2 shrink-0 shadow-sm border border-black/5 -mt-12 sm:-mt-16">
-                <div className="w-full h-full bg-brand-bg rounded-full flex items-center justify-center border border-black/5 overflow-hidden relative group">
-                  <User size={48} className="text-black/30" />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
-                    <Edit2 size={20} className="text-white" />
-                  </div>
-                </div>
-              </div>
-              <div className="flex-1 pb-1">
-                <div className="flex items-center gap-3 mb-1">
-                  <h1 className="text-2xl md:text-3xl font-black tracking-tight">{user?.username}</h1>
-                  {user?.is_staff && (
-                    <span className="flex items-center text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full uppercase tracking-widest">
-                      <ShieldCheck size={12} className="mr-1" /> Verified Staff
-                    </span>
-                  )}
-                </div>
-                <p className="text-black/50 text-sm font-medium flex items-center gap-2">
-                  <Mail size={14} /> {user?.email || "No email provided"}
-                </p>
-              </div>
-              <div className="pb-2 w-full sm:w-auto mt-4 sm:mt-0">
-                <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 border border-black/10 font-bold text-xs uppercase tracking-widest transition-colors hover:bg-black/10">
-                  <Edit2 size={14} /> Edit Profile
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-6 border-t border-black/5 pt-8 relative z-10">
-              <StatBox label="Total Orders" value={orders.length} icon={Package} />
-              <StatBox label="Total Spent" value={formatRupiah(totalSpent)} icon={CreditCard} />
-              <StatBox label="Items Bought" value={totalItems} icon={Box} />
-              <StatBox label="Member Since" value={new Date().getFullYear()} icon={Calendar} />
-            </div>
-          </div>
+          <AccountHeader 
+            user={user} 
+            orders={orders} 
+            totalSpent={formatRupiah(totalSpent)} 
+            totalItems={totalItems} 
+            onEditClick={() => setIsEditModalOpen(true)} 
+          />
 
           <div className="lg:col-span-1 flex flex-col gap-6">
             <div className="bg-black text-white rounded-lg p-6 md:p-8 shadow-sm flex flex-col justify-between relative overflow-hidden h-full">
@@ -134,70 +101,20 @@ export default function AccountPage() {
           </div>
         </div>
 
-        <div className="mt-6 bg-white rounded-lg p-6 md:p-8 shadow-sm border border-black/5">
-          <div className="flex items-center gap-8 border-b border-black/5 mb-6 overflow-x-auto no-scrollbar">
-            {['orders', 'watchlist', 'settings'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`pb-4 text-sm font-bold uppercase tracking-widest transition-colors relative whitespace-nowrap ${
-                  activeTab === tab ? 'text-black' : 'text-black/30 hover:text-black/60'
-                }`}
-              >
-                {tab}
-                {activeTab === tab && (
-                  <motion.div 
-                    layoutId="activeTab" 
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" 
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-
-          <div className="h-[300px] overflow-y-auto pr-2 no-scrollbar">
-            {activeTab === 'orders' && (
-              loadingOrders ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map(i => (
-                    <OrderRowSkeleton key={i} />
-                  ))}
-                </div>
-              ) : orders.length === 0 ? (
-                <div className="h-[300px] flex flex-col items-center justify-center text-center">
-                  <div className="w-16 h-16 bg-brand-bg rounded-full flex items-center justify-center mb-4">
-                    <Package size={24} className="text-black/30" />
-                  </div>
-                  <h3 className="text-lg font-black mb-2">No Recent Orders</h3>
-                  <p className="text-sm text-black/50 mb-6 max-w-xs font-medium">You haven't made any purchases yet. Explore our collection to find your next pair!</p>
-                  <Link to="/" className="bg-black text-white px-6 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black/80 transition-colors">
-                    Start Shopping
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {orders.map(order => (
-                    <OrderRow key={order.id} order={order} />
-                  ))}
-                </div>
-              )
-            )}
-
-            {activeTab === 'watchlist' && (
-              <div className="h-[300px] flex flex-col items-center justify-center text-center">
-                <p className="text-sm text-black/50 font-bold uppercase tracking-widest">Watchlist is coming soon</p>
-              </div>
-            )}
-
-            {activeTab === 'settings' && (
-              <div className="h-[300px] flex flex-col items-center justify-center text-center">
-                <p className="text-sm text-black/50 font-bold uppercase tracking-widest">Settings are coming soon</p>
-              </div>
-            )}
-          </div>
-        </div>
-
+        <AccountTabs 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          orders={orders} 
+          loadingOrders={loadingOrders} 
+          onStatusChange={fetchOrders} 
+        />
       </div>
+
+      <AnimatePresence>
+        {isEditModalOpen && (
+          <EditProfileModal onClose={() => setIsEditModalOpen(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

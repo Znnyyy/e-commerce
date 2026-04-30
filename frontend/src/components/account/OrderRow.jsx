@@ -1,18 +1,34 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Package, Calendar, ChevronDown, ChevronUp, Box, CreditCard } from "lucide-react";
+import { Package, Calendar, ChevronDown, ChevronUp, Box, CreditCard, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 import StatusBadge from "../admin/orders/StatusBadge";
 import { formatRupiah } from "../../utils/format";
+import { syncOrder } from "../../api/api";
 
-export const OrderRow = ({ order }) => {
+export const OrderRow = ({ order, onStatusChange }) => {
   const [expanded, setExpanded] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const navigate = useNavigate();
+
+  const handleSync = async (e) => {
+    if (e) e.stopPropagation();
+    try {
+      setIsSyncing(true);
+      await syncOrder(order.id);
+      if (onStatusChange) onStatusChange();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const handlePayNow = (e) => {
     e.stopPropagation();
     if (!order.snap_token) {
-      import('react-hot-toast').then(({ default: toast }) => toast.error('Payment token is missing.'));
+      toast.error('Payment token is missing.');
       return;
     }
 
@@ -27,11 +43,13 @@ export const OrderRow = ({ order }) => {
           state: { order: order, paymentResult: result, paymentStatus: 'pending' }
         });
       },
-      onError: () => {
-        import('react-hot-toast').then(({ default: toast }) => toast.error('Payment failed. Please try again.'));
+      onError: async () => {
+        toast.error('Payment failed. Please try again.');
+        await handleSync();
       },
-      onClose: () => {
-        import('react-hot-toast').then(({ default: toast }) => toast('Payment window closed.', { icon: 'ℹ️' }));
+      onClose: async () => {
+        toast('Payment window closed.', { icon: 'ℹ️' });
+        await handleSync();
       },
     });
   };
@@ -70,13 +88,23 @@ export const OrderRow = ({ order }) => {
             <p className="text-sm font-bold text-black/70">{order.items?.length || 0}</p>
           </div>
           {order.status === 'pending' && (
-            <button 
-              onClick={handlePayNow}
-              className="bg-black text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-black/80 transition-colors shrink-0"
-            >
-              <CreditCard size={14} />
-              Pay Now
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button 
+                onClick={handleSync}
+                disabled={isSyncing}
+                className="p-2 text-black/40 hover:text-black hover:bg-black/5 rounded-full transition-colors disabled:opacity-50"
+                title="Sync Status"
+              >
+                <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
+              </button>
+              <button 
+                onClick={handlePayNow}
+                className="bg-black text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-black/80 transition-colors"
+              >
+                <CreditCard size={14} />
+                Pay Now
+              </button>
+            </div>
           )}
           <button className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-black/60 hover:bg-black/10 transition-colors shrink-0">
             {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}

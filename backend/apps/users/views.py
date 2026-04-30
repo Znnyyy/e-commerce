@@ -9,12 +9,27 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = RegisterSerializer
 
-class UserDetailView(generics.RetrieveAPIView):
+class UserDetailView(generics.RetrieveUpdateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = UserSerializer
 
     def get_object(self):
         return self.request.user
+
+    def patch(self, request, *args, **kwargs):
+        user = self.get_object()
+        
+        # Handle avatar upload
+        avatar = request.FILES.get('avatar')
+        if avatar:
+            # Ensure profile exists
+            if not hasattr(user, 'profile'):
+                from .models import UserProfile
+                UserProfile.objects.create(user=user)
+            user.profile.avatar = avatar
+            user.profile.save()
+
+        return super().patch(request, *args, **kwargs)
 
 class UserListView(APIView):
     permission_classes = (permissions.IsAdminUser,)

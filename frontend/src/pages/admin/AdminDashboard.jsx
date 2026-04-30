@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import api from '../../api/axios';
 import { formatRupiah } from '../../utils/format';
-import { TrendingUp, ShoppingBag, Users, Package, ArrowRight, MousePointerClick, Trophy } from 'lucide-react';
+import { TrendingUp, ShoppingBag, Users, Package, ArrowRight, Trophy } from 'lucide-react';
 import TableRowSkeleton from '../../components/ui/skeletons/TableRowSkeleton';
 import StatusBadge from '../../components/admin/orders/StatusBadge';
 import { Link } from 'react-router-dom';
@@ -52,7 +52,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Baris 1: Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard dark label="Total Revenue" value={loading ? '...' : formatRupiah(stats?.total_revenue || 0)} icon={TrendingUp} />
         <StatCard label="Orders" value={loading ? '...' : stats?.total_orders || 0} icon={ShoppingBag} />
@@ -60,7 +59,6 @@ export default function AdminDashboard() {
         <StatCard label="Products" value={loading ? '...' : stats?.total_products || 0} icon={Package} />
       </div>
 
-      {/* Baris 2: Revenue Chart & Status Breakdown */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="xl:col-span-2 bg-white border border-black/5 rounded-3xl p-6 shadow-sm">
           <div className="flex justify-between items-center mb-4">
@@ -127,7 +125,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Baris 3: Recent Activity & Top Selling */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="xl:col-span-2 bg-white border border-black/5 rounded-3xl overflow-hidden shadow-sm">
           <div className="px-6 py-4 border-b border-black/5 flex justify-between items-center">

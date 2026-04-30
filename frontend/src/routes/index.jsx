@@ -25,37 +25,16 @@ export const router = createBrowserRouter([
         path: "/",
         element: <MainLayout />,
         children: [
-      {
-        path: "/",
-        element: <LandingPage />
-      },
-          {
-            path: "/",
-            element: <LandingPage />
-          },
-          {
-            path: "/home",
-            element: <Home />
-          },
-          {
-            path: "/product/:id",
-            element: <ProductDetail />
-          },
+          { index: true, element: <LandingPage /> },
+          { path: "/home", element: <Home /> },
+          { path: "/product/:id", element: <ProductDetail /> },
           {
             path: "/checkout",
             element: <CartRoute />,
-            children: [
-              { index: true, element: <Checkout /> }
-            ]
+            children: [{ index: true, element: <Checkout /> }]
           },
-          {
-            path: "/checkout/success",
-            element: <Success />
-          },
-          {
-            path: "/account",
-            element: <AccountPage />
-          }
+          { path: "/checkout/success", element: <Success /> },
+          { path: "/account", element: <AccountPage /> },
         ],
       }
     ]

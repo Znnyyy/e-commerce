@@ -15,6 +15,9 @@ export default function ProductDetailImage({ product }) {
     }
   }, [primaryImage]);
 
+  const totalStock = product.variants?.reduce((sum, v) => sum + v.stock, 0) || 0;
+  const isSoldOut = totalStock === 0;
+
   return (
     <motion.div 
       initial={{ x: -50, opacity: 0 }}
@@ -27,12 +30,21 @@ export default function ProductDetailImage({ product }) {
       </Link>
       
       {activeImage ? (
-        <img 
-          key={activeImage}
-          src={getImageUrl(activeImage)} 
-          alt={product.name} 
-          className="w-full h-full object-cover absolute inset-0" 
-        />
+        <div className="w-full h-full relative">
+          <img 
+            key={activeImage}
+            src={getImageUrl(activeImage)} 
+            alt={product.name} 
+            className={`w-full h-full object-cover absolute inset-0 ${isSoldOut ? 'grayscale brightness-50' : ''}`} 
+          />
+          {isSoldOut && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[4px] z-10">
+              <span className="bg-white text-black px-12 py-5 rounded-full text-xl font-black uppercase tracking-[0.3em] shadow-2xl border-4 border-black/10">
+                Sold Out
+              </span>
+            </div>
+          )}
+        </div>
       ) : (
         <div className="w-full h-full flex items-center justify-center font-bold text-black/30 uppercase tracking-widest text-sm">NO IMAGE</div>
       )}

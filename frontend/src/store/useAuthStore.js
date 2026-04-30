@@ -13,18 +13,17 @@ const useAuthStore = create((set) => ({
       const res = await api.post('/users/token/', { username, password });
       localStorage.setItem('access_token', res.data.access);
       localStorage.setItem('refresh_token', res.data.refresh);
-      
-      // Fetch user profile immediately
+
       const userRes = await api.get('/users/me/', {
         headers: { Authorization: `Bearer ${res.data.access}` }
       });
-      
+
       set({ user: userRes.data, isAuthenticated: true, isLoading: false });
       return true;
     } catch (err) {
-      set({ 
+      set({
         error: err.response?.data?.detail || 'Login failed. Please check your credentials.',
-        isLoading: false 
+        isLoading: false
       });
       return false;
     }
@@ -34,9 +33,7 @@ const useAuthStore = create((set) => ({
     try {
       set({ isLoading: true, error: null });
       await api.post('/users/register/', { username, email, password });
-      // Automate login after register
-      const success = await useAuthStore.getState().login(username, password);
-      return success;
+      return await useAuthStore.getState().login(username, password);
     } catch (err) {
       const errorMsg = Object.values(err.response?.data || {}).flat().join(', ') || 'Registration failed.';
       set({ error: errorMsg, isLoading: false });
@@ -54,17 +51,19 @@ const useAuthStore = create((set) => ({
     const token = localStorage.getItem('access_token');
     if (!token) {
       set({ isLoading: false, isAuthenticated: false });
-      return null;
+      return;
     }
     try {
       const res = await api.get('/users/me/');
       set({ user: res.data, isAuthenticated: true, isLoading: false });
-    } catch (err) {
+    } catch {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       set({ user: null, isAuthenticated: false, isLoading: false });
     }
-  }
+  },
+
+  updateUser: (userData) => set({ user: userData }),
 }));
 
 export default useAuthStore;

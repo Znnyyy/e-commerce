@@ -1,8 +1,8 @@
-import { Edit3, Trash2, PackageOpen } from 'lucide-react';
+import { Edit3, Trash2, PackageOpen, PackagePlus } from 'lucide-react';
 import { getImageUrl } from '../../api/axios';
 import TableRowSkeleton from '../ui/skeletons/TableRowSkeleton';
 
-export default function ProductTable({ products, isLoading, selectedProductId, onRowClick, onEdit, onDelete, getStockStatus, getTotalStock, getBasePrice }) {
+export default function ProductTable({ products, isLoading, selectedProductId, onRowClick, onEdit, onDelete, onRestock, getStockStatus, getTotalStock, getBasePrice }) {
   return (
     <div className="flex-1 overflow-auto rounded-2xl border border-black/5">
       <table className="w-full text-left border-collapse text-sm">
@@ -55,14 +55,23 @@ export default function ProductTable({ products, isLoading, selectedProductId, o
                   <td className="p-4 border-b border-black/5 font-medium">{getBasePrice(prod.variants)}</td>
                   <td className="p-4 border-b border-black/5 text-right space-x-1">
                     <button
-                      className="p-2 text-black/40 hover:text-black hover:bg-black/5 rounded-full transition-colors inline-flex opacity-0 group-hover:opacity-100"
+                      className="p-2 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full transition-colors inline-flex"
+                      onClick={(e) => { e.stopPropagation(); onRestock(prod); }}
+                      title="Quick Restock"
+                    >
+                      <PackagePlus size={16} />
+                    </button>
+                    <button
+                      className="p-2 text-black/40 hover:text-black hover:bg-black/5 rounded-full transition-colors inline-flex"
                       onClick={(e) => { e.stopPropagation(); onEdit(prod); }}
+                      title="Edit Product"
                     >
                       <Edit3 size={16} />
                     </button>
                     <button
-                      className="p-2 text-red-400 hover:text-white hover:bg-red-500 rounded-full transition-colors inline-flex opacity-0 group-hover:opacity-100"
+                      className="p-2 text-red-400 hover:text-white hover:bg-red-500 rounded-full transition-colors inline-flex"
                       onClick={(e) => { e.stopPropagation(); onDelete(prod); }}
+                      title="Delete Product"
                     >
                       <Trash2 size={16} />
                     </button>

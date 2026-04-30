@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCart, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { formatRupiah } from "../../utils/format";
 import useCartStore from "../../store/useCartStore";
 import useAuthStore from "../../store/useAuthStore";
@@ -57,10 +58,10 @@ export default function ProductDetailInfo({ product, selectedVariantId, setSelec
     try {
       await addItem(selectedVariant.id, 1);
       setAddedFeedback(true);
-      import('react-hot-toast').then(({ default: toast }) => toast.success('Added to cart'));
+      toast.success('Added to cart');
       setTimeout(() => setAddedFeedback(false), 2000);
     } catch (err) {
-      import('react-hot-toast').then(({ default: toast }) => toast.error(err.message));
+      toast.error(err.message);
     }
   };
 

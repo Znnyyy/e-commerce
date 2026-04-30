@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/useAuthStore';
 import { ArrowLeft, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import AuthImagePanel from '../../components/auth/AuthImagePanel';
 
 export default function RegisterPage() {
@@ -13,9 +14,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (error) {
-      import('react-hot-toast').then(({ default: toast }) => toast.error(error));
-    }
+    if (error) toast.error(error);
   }, [error]);
 
   const handleSubmit = async (e) => {

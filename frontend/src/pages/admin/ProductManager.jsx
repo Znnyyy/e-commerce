@@ -8,6 +8,7 @@ import ProductTable from '../../components/admin/ProductTable';
 import ProductDetailPanel from '../../components/admin/ProductDetailPanel';
 import ProductFormal from '../../components/admin/ProductFormal';
 import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
+import QuickRestockModal from '../../components/admin/QuickRestockModal';
 
 const getStockStatus = (variants) => {
   if (!variants || variants.length === 0) return { label: 'No Stock', color: 'bg-black/10 text-black' };
@@ -29,16 +30,36 @@ const getBasePrice = (variants) => {
 
 export default function ProductManager() {
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('any');
+  const [brandFilter, setBrandFilter] = useState('all');
 
   const { data: productsData, isLoading } = useQuery({
     queryKey: ['admin_products'],
     queryFn: () => getProducts().then(res => res.data),
   });
 
-  const products = productsData?.results || productsData || [];
+  const allProducts = productsData?.results || productsData || [];
+
+  const filteredProducts = allProducts.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          product.brand?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const totalStock = getTotalStock(product.variants);
+    const matchesStatus = statusFilter === 'any' || 
+                         (statusFilter === 'in_stock' && totalStock > 0) ||
+                         (statusFilter === 'out_of_stock' && totalStock === 0);
+    
+    const matchesBrand = brandFilter === 'all' || product.brand === brandFilter;
+
+    return matchesSearch && matchesStatus && matchesBrand;
+  });
+
+  const brands = Array.from(new Set(allProducts.map(p => p.brand).filter(Boolean)));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [restockTarget, setRestockTarget] = useState(null);
 
   return (
     <div className="flex h-full gap-6">
@@ -55,6 +76,8 @@ export default function ProductManager() {
               <input
                 type="text"
                 placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="bg-brand-bg rounded-full py-2.5 pl-12 pr-4 text-sm font-medium outline-none border border-black/5 focus:border-black/20 w-64 transition-colors"
               />
             </div>
@@ -65,15 +88,22 @@ export default function ProductManager() {
           </div>
         </div>
 
-        <ProductFilters />
+        <ProductFilters 
+          status={statusFilter}
+          setStatus={setStatusFilter}
+          brand={brandFilter}
+          setBrand={setBrandFilter}
+          brands={brands}
+        />
 
         <ProductTable
-          products={products}
+          products={filteredProducts}
           isLoading={isLoading}
           selectedProductId={selectedProduct?.id}
           onRowClick={setSelectedProduct}
           onEdit={(prod) => setEditProduct(prod)}
           onDelete={(prod) => setDeleteTarget(prod)}
+          onRestock={(prod) => setRestockTarget(prod)}
           getStockStatus={getStockStatus}
           getTotalStock={getTotalStock}
           getBasePrice={getBasePrice}
@@ -109,6 +139,14 @@ export default function ProductManager() {
             onDeleted={() => {
               if (selectedProduct?.id === deleteTarget.id) setSelectedProduct(null);
             }}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {restockTarget && (
+          <QuickRestockModal
+            product={restockTarget}
+            onClose={() => setRestockTarget(null)}
           />
         )}
       </AnimatePresence>

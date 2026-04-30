@@ -48,7 +48,11 @@ function ColorGroup({ color, variants }) {
               {variants.map((v) => (
                 <div key={v.id} className="flex items-center justify-between px-4 py-2.5 bg-white">
                   <div>
-                    <p className="text-xs font-bold">Size {v.size}</p>
+                    <p className="text-xs font-bold flex items-center gap-2">
+                      Size {v.size}
+                      {v.stock === 0 && <span className="bg-red-500/10 text-red-600 text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-widest font-bold">Out of Stock</span>}
+                      {v.stock > 0 && v.stock < 10 && <span className="bg-orange-500/10 text-orange-600 text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-widest font-bold">Low Stock</span>}
+                    </p>
                     <p className="text-[10px] opacity-50 uppercase tracking-widest mt-0.5">SKU: {v.sku}</p>
                   </div>
                   <div className="text-right">

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/useAuthStore';
 import { ArrowLeft, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import AuthImagePanel from '../../components/auth/AuthImagePanel';
 
 export default function LoginPage() {
@@ -15,9 +16,7 @@ export default function LoginPage() {
   const from = location.state?.from?.pathname || '/';
 
   useEffect(() => {
-    if (error) {
-      import('react-hot-toast').then(({ default: toast }) => toast.error(error));
-    }
+    if (error) toast.error(error);
   }, [error]);
 
   const handleSubmit = async (e) => {
