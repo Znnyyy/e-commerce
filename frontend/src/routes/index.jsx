@@ -9,6 +9,7 @@ import RegisterPage from "../pages/auth/RegisterPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import ProductManager from "../pages/admin/ProductManager";
 import OrderManager from "../pages/admin/OrderManager";
+import UserManager from "../pages/admin/UserManager";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import CartRoute from "../components/auth/CartRoute";
 import Checkout from "../pages/cart/Checkout";
@@ -72,8 +73,8 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute requireSuperadmin={true} />,
             children: [
               {
-                path: "",
-                element: <Navigate to="products" replace />
+                index: true,
+                element: <AdminDashboard />
               }
             ]
           },
@@ -84,6 +85,10 @@ export const router = createBrowserRouter([
           {
             path: "orders",
             element: <OrderManager />
+          },
+          {
+            path: "users",
+            element: <UserManager />
           }
         ]
       }

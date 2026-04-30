@@ -3,14 +3,14 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import useCartStore from '../../store/useCartStore';
 import { formatRupiah } from '../../utils/format';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, CreditCard, Loader2 } from 'lucide-react';
 import api from '../../api/axios';
+import toast from 'react-hot-toast';
 
 export default function Checkout() {
-  const { cart, clearAll, loadCart } = useCartStore();
+  const { cart, clearAll } = useCartStore();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     shipping_name: '',
     shipping_address: '',
@@ -25,27 +25,49 @@ export default function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     try {
-      // Create order
+      // 1. Buat order & dapatkan snap_token dari backend
       const response = await api.post('/orders/', formData);
       const orderData = response.data;
+      const snapToken = orderData.snap_token;
 
-      // Navigate DULU sebelum clear cart → CartRoute sudah unmount,
-      // sehingga tidak mendeteksi cart kosong dan salah redirect
-      navigate('/checkout/success', { state: { order: orderData } });
+      if (!snapToken) {
+        throw new Error('Payment token not received. Please try again.');
+      }
 
-      // Baru bersihkan cart setelah navigasi terjadi
-      await clearAll();
+      // 2. Buka popup Midtrans Snap
+      window.snap.pay(snapToken, {
+        onSuccess: async (result) => {
+          // Pembayaran berhasil
+          await clearAll();
+          navigate('/checkout/success', {
+            state: { order: orderData, paymentResult: result, paymentStatus: 'paid' }
+          });
+        },
+        onPending: async (result) => {
+          // Pembayaran pending (misal: transfer bank belum dikonfirmasi)
+          await clearAll();
+          navigate('/checkout/success', {
+            state: { order: orderData, paymentResult: result, paymentStatus: 'pending' }
+          });
+        },
+        onError: (result) => {
+          // Pembayaran gagal
+          toast.error('Payment failed. Please try again.');
+          setLoading(false);
+        },
+        onClose: () => {
+          // User tutup popup tanpa menyelesaikan pembayaran
+          toast('Payment cancelled. Your order is saved — you can pay later.', { icon: 'ℹ️' });
+          setLoading(false);
+        },
+      });
 
-      import('react-hot-toast').then(({ default: toast }) => toast.success('Order placed successfully!'));
     } catch (err) {
-      console.error("Checkout error:", err);
-      const errMsg = err.response?.data?.error || "Failed to process checkout. Please try again.";
-      setError(errMsg);
-      import('react-hot-toast').then(({ default: toast }) => toast.error(errMsg));
-    } finally {
+      console.error('Checkout error:', err);
+      const errMsg = err.response?.data?.error || err.message || 'Failed to process checkout.';
+      toast.error(errMsg);
       setLoading(false);
     }
   };
@@ -53,10 +75,9 @@ export default function Checkout() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-7xl mx-auto px-6 py-12">
       <h1 className="text-4xl font-black uppercase tracking-tighter mb-12 border-b border-black/10 pb-6">Checkout</h1>
-      
-
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        {/* Form */}
         <div className="lg:col-span-7">
           <h2 className="text-xl font-black uppercase tracking-widest mb-6">Shipping Information</h2>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -69,7 +90,7 @@ export default function Checkout() {
                 value={formData.shipping_name}
                 onChange={handleChange}
                 className="w-full border border-black/20 px-4 py-3 focus:outline-none focus:border-black transition-colors"
-                placeholder="Fill Your Name"
+                placeholder="Your full name"
               />
             </div>
             <div>
@@ -81,7 +102,7 @@ export default function Checkout() {
                 value={formData.shipping_phone}
                 onChange={handleChange}
                 className="w-full border border-black/20 px-4 py-3 focus:outline-none focus:border-black transition-colors"
-                placeholder="Fill Your Number Phone"
+                placeholder="08xxxxxxxxxx"
               />
             </div>
             <div>
@@ -93,7 +114,7 @@ export default function Checkout() {
                 value={formData.shipping_city}
                 onChange={handleChange}
                 className="w-full border border-black/20 px-4 py-3 focus:outline-none focus:border-black transition-colors"
-                placeholder="Fill Your City"
+                placeholder="Jakarta"
               />
             </div>
             <div>
@@ -105,26 +126,42 @@ export default function Checkout() {
                 value={formData.shipping_address}
                 onChange={handleChange}
                 className="w-full border border-black/20 px-4 py-3 focus:outline-none focus:border-black transition-colors resize-none"
-                placeholder="Fill Your Address"
+                placeholder="Jl. Sudirman No.1, RT 01/02..."
               />
             </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-black text-white font-bold uppercase tracking-widest py-4 hover:bg-black/80 transition-colors disabled:opacity-50"
+              className="w-full bg-black text-white font-bold uppercase tracking-widest py-4 hover:bg-black/80 transition-colors disabled:opacity-50 flex items-center justify-center gap-3"
             >
-              {loading ? 'Processing...' : 'Place Order'}
+              {loading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <CreditCard size={18} />
+                  Proceed to Payment
+                </>
+              )}
             </button>
+
+            <p className="text-center text-xs opacity-40 font-medium">
+              Secured by Midtrans · Supports GoPay, QRIS, Transfer, Credit Card
+            </p>
           </form>
         </div>
 
+        {/* Order Summary */}
         <div className="lg:col-span-5">
           <div className="bg-[#f4f4f4] p-8">
             <div className="flex items-center gap-3 mb-6 border-b border-black/10 pb-6">
               <ShoppingBag size={24} />
               <h2 className="text-xl font-black uppercase tracking-widest">Order Summary</h2>
             </div>
-            
+
             <div className="space-y-4 mb-8">
               {cart.items.map((item) => (
                 <div key={item.id} className="flex gap-4">

@@ -43,6 +43,22 @@ export default function OrderManager() {
     }
   };
 
+  const handleSyncMidtrans = async (orderId) => {
+    setUpdatingId(orderId);
+    try {
+      const res = await api.post(`/orders/${orderId}/sync_midtrans/`);
+      setOrders(prev => prev.map(o => o.id === orderId ? res.data : o));
+      if (selectedOrder?.id === orderId) setSelectedOrder(res.data);
+      import('react-hot-toast').then(({ default: toast }) => toast.success('Status synced with Midtrans'));
+    } catch (err) {
+      console.error('Failed to sync midtrans', err);
+      const errMsg = err.response?.data?.error || 'Failed to sync with Midtrans';
+      import('react-hot-toast').then(({ default: toast }) => toast.error(errMsg));
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const counts = STATUS_OPTIONS.slice(1).reduce((acc, s) => {
     acc[s] = orders.filter(o => o.status === s).length;
     return acc;
@@ -158,6 +174,7 @@ export default function OrderManager() {
             order={selectedOrder}
             onClose={() => setSelectedOrder(null)}
             onStatusChange={handleStatusChange}
+            onSyncMidtrans={handleSyncMidtrans}
             updatingId={updatingId}
           />
         )}

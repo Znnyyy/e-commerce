@@ -13,7 +13,7 @@ export default function DashboardLayout() {
   return (
     <div className="flex min-h-screen bg-brand-bg w-full">
       <Sidebar />
-      <main className="ml-64 flex-1 p-6 h-screen flex flex-col">
+      <main className="ml-64 flex-1 p-8 min-h-screen">
         <Outlet />
       </main>
     </div>

@@ -1,16 +1,10 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Package } from 'lucide-react';
+import { X, Package, RefreshCw, Truck } from 'lucide-react';
 import { formatRupiah } from '../../../utils/format';
-import StatusBadge, { STATUS_CONFIG } from './StatusBadge';
-import Dropdown from '../../ui/Dropdown';
+import StatusBadge from './StatusBadge';
 
-export default function OrderDetailPanel({ order, onClose, onStatusChange, updatingId }) {
-  const statusOptions = Object.keys(STATUS_CONFIG).map(key => ({
-    value: key,
-    label: STATUS_CONFIG[key].label,
-    Icon: STATUS_CONFIG[key].Icon
-  }));
+export default function OrderDetailPanel({ order, onClose, onStatusChange, onSyncMidtrans, updatingId }) {
 
   return (
     <motion.div
@@ -43,14 +37,28 @@ export default function OrderDetailPanel({ order, onClose, onStatusChange, updat
             <p className="text-[10px] font-bold uppercase tracking-widest opacity-50 mb-2">Status</p>
             <div className="flex items-center justify-between gap-3">
               <StatusBadge status={order.status} />
-              <Dropdown
-                value={order.status}
-                options={statusOptions}
-                onChange={(newStatus) => onStatusChange(order.id, newStatus)}
-                className="w-auto"
-                align="right"
-                buttonClassName="!py-1.5 !px-3 !text-[10px]"
-              />
+              
+              {order.status === 'pending' && (
+                <button
+                  onClick={() => onSyncMidtrans(order.id)}
+                  disabled={updatingId === order.id}
+                  className="flex items-center gap-1.5 bg-black text-white px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-black/80 transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw size={12} className={updatingId === order.id ? 'animate-spin' : ''} />
+                  {updatingId === order.id ? 'Syncing...' : 'Sync Payment'}
+                </button>
+              )}
+
+              {order.status === 'paid' && (
+                <button
+                  onClick={() => onStatusChange(order.id, 'shipped')}
+                  disabled={updatingId === order.id}
+                  className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-colors disabled:opacity-50"
+                >
+                  <Truck size={12} />
+                  Mark as Shipped
+                </button>
+              )}
             </div>
           </div>
 

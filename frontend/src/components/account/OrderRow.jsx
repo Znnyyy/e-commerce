@@ -1,12 +1,40 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { Package, Calendar, ChevronDown, ChevronUp, Box } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Package, Calendar, ChevronDown, ChevronUp, Box, CreditCard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import StatusBadge from "../admin/orders/StatusBadge";
 import { formatRupiah } from "../../utils/format";
 
 export const OrderRow = ({ order }) => {
   const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
+
+  const handlePayNow = (e) => {
+    e.stopPropagation();
+    if (!order.snap_token) {
+      import('react-hot-toast').then(({ default: toast }) => toast.error('Payment token is missing.'));
+      return;
+    }
+
+    window.snap.pay(order.snap_token, {
+      onSuccess: (result) => {
+        navigate('/checkout/success', {
+          state: { order: order, paymentResult: result, paymentStatus: 'paid' }
+        });
+      },
+      onPending: (result) => {
+        navigate('/checkout/success', {
+          state: { order: order, paymentResult: result, paymentStatus: 'pending' }
+        });
+      },
+      onError: () => {
+        import('react-hot-toast').then(({ default: toast }) => toast.error('Payment failed. Please try again.'));
+      },
+      onClose: () => {
+        import('react-hot-toast').then(({ default: toast }) => toast('Payment window closed.', { icon: 'ℹ️' }));
+      },
+    });
+  };
 
   return (
     <div className="border border-black/5 rounded-2xl overflow-hidden bg-white hover:border-black/10 transition-colors">
@@ -41,7 +69,16 @@ export const OrderRow = ({ order }) => {
             <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest mb-1">Items</p>
             <p className="text-sm font-bold text-black/70">{order.items?.length || 0}</p>
           </div>
-          <button className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-black/60 hover:bg-black/10 transition-colors">
+          {order.status === 'pending' && (
+            <button 
+              onClick={handlePayNow}
+              className="bg-black text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-black/80 transition-colors shrink-0"
+            >
+              <CreditCard size={14} />
+              Pay Now
+            </button>
+          )}
+          <button className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-black/60 hover:bg-black/10 transition-colors shrink-0">
             {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
         </div>

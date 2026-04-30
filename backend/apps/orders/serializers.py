@@ -43,7 +43,7 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'status', 'total_amount',
             'shipping_name', 'shipping_address', 'shipping_city', 'shipping_phone',
-            'created_at', 'items'
+            'created_at', 'items', 'snap_token'
         ]
         read_only_fields = ['status', 'total_amount', 'created_at']
 
