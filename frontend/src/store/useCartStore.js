@@ -8,8 +8,8 @@ import {
 } from '../api/api';
 
 const useCartStore = create((set, get) => ({
-  cart: null,          // { id, items: [...], total, item_count }
-  isOpen: false,       // apakah drawer cart terbuka
+  cart: null,          
+  isOpen: false,       
   isLoading: false,
   error: null,
 

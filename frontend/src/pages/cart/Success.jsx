@@ -26,7 +26,7 @@ export default function Success() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-3xl mx-auto px-6 py-20"
     >
-      {/* Icon & Status */}
+      
       <div className="text-center mb-12">
         {isPaid ? (
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.1 }}>
@@ -48,7 +48,7 @@ export default function Success() {
         </p>
       </div>
 
-      {/* Status Banner */}
+      
       <div className={`flex items-center gap-3 p-4 rounded-2xl mb-8 ${isPaid ? 'bg-green-50 border border-green-100' : 'bg-amber-50 border border-amber-100'}`}>
         <div className={`w-2 h-2 rounded-full ${isPaid ? 'bg-green-500' : 'bg-amber-500 animate-pulse'}`} />
         <p className={`text-xs font-black uppercase tracking-widest ${isPaid ? 'text-green-700' : 'text-amber-700'}`}>
@@ -59,7 +59,7 @@ export default function Success() {
         </span>
       </div>
 
-      {/* Order Details */}
+      
       <div className="bg-[#f4f4f4] p-8 mb-8 border border-black/5 rounded-2xl">
         <h2 className="text-sm font-black uppercase tracking-widest border-b border-black/10 pb-4 mb-6 opacity-60">Order Details</h2>
         <div className="grid grid-cols-2 gap-6 mb-6">
@@ -92,7 +92,7 @@ export default function Success() {
         </div>
       </div>
 
-      {/* CTA Buttons */}
+      
       <div className="flex flex-col sm:flex-row gap-3">
         <button
           onClick={() => navigate('/home')}

@@ -10,18 +10,12 @@ import { TrendingUp, ShoppingBag, Users, Package, ArrowRight, Trophy } from 'luc
 import TableRowSkeleton from '../../components/ui/skeletons/TableRowSkeleton';
 import StatusBadge from '../../components/admin/orders/StatusBadge';
 import { Link } from 'react-router-dom';
+import StatCards from './StatCards';
+import RecentOrdersTable from './RecentOrdersTable';
 
 const STATUS_COLORS = { pending: '#f59e0b', paid: '#10b981', shipped: '#3b82f6', failed: '#ef4444' };
 
-const StatCard = ({ label, value, icon: Icon, dark = false }) => (
-  <div className={`p-5 rounded-3xl border ${dark ? 'bg-black text-white border-black' : 'bg-white border-black/5 shadow-sm'}`}>
-    <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${dark ? 'bg-white/10' : 'bg-black/5'}`}>
-      <Icon size={18} className={dark ? 'text-white' : 'text-black'} />
-    </div>
-    <p className={`text-[10px] font-bold uppercase tracking-widest ${dark ? 'text-white/40' : 'opacity-40'}`}>{label}</p>
-    <p className="text-xl font-black tracking-tight mt-0.5">{value}</p>
-  </div>
-);
+
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -52,12 +46,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard dark label="Total Revenue" value={loading ? '...' : formatRupiah(stats?.total_revenue || 0)} icon={TrendingUp} />
-        <StatCard label="Orders" value={loading ? '...' : stats?.total_orders || 0} icon={ShoppingBag} />
-        <StatCard label="Customers" value={loading ? '...' : stats?.total_users || 0} icon={Users} />
-        <StatCard label="Products" value={loading ? '...' : stats?.total_products || 0} icon={Package} />
-      </div>
+      <StatCards stats={stats} loading={loading} />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="xl:col-span-2 bg-white border border-black/5 rounded-3xl p-6 shadow-sm">
@@ -126,42 +115,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 bg-white border border-black/5 rounded-3xl overflow-hidden shadow-sm">
-          <div className="px-6 py-4 border-b border-black/5 flex justify-between items-center">
-            <h3 className="font-black uppercase tracking-widest text-[10px] opacity-40">Recent Activity</h3>
-            <Link to="/admin/orders" className="text-[9px] font-black uppercase tracking-widest hover:opacity-50 transition-opacity flex items-center gap-1">
-              All Orders <ArrowRight size={10} />
-            </Link>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-brand-bg/20">
-                <tr className="text-[9px] uppercase tracking-widest font-black opacity-30">
-                  <th className="px-6 py-3">ID</th>
-                  <th className="px-6 py-3">Customer</th>
-                  <th className="px-6 py-3">Status</th>
-                  <th className="px-6 py-3 text-right">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  [1,2,3].map(i => <TableRowSkeleton key={i} columns={4} />)
-                ) : stats?.recent_orders?.length > 0 ? (
-                  stats.recent_orders.slice(0, 4).map(order => (
-                    <tr key={order.id} className="border-b border-black/5 last:border-none hover:bg-brand-bg/30 transition-colors">
-                      <td className="px-6 py-3.5 font-black text-xs">#{order.id}</td>
-                      <td className="px-6 py-3.5 font-bold text-xs">{order.shipping_name}</td>
-                      <td className="px-6 py-3.5"><StatusBadge status={order.status} /></td>
-                      <td className="px-6 py-3.5 text-right font-black text-xs">{formatRupiah(order.total_amount)}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr><td colSpan={4} className="py-10 text-center opacity-20 text-[10px] font-bold uppercase">No activity</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <RecentOrdersTable loading={loading} recentOrders={stats?.recent_orders} />
 
         <div className="bg-white border border-black/5 rounded-3xl p-6 shadow-sm">
           <h3 className="font-black uppercase tracking-widest text-[10px] opacity-40 mb-5 flex items-center gap-2">

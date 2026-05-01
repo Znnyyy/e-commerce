@@ -10,7 +10,7 @@ export default function Dropdown({
   className = "",
   buttonClassName = "",
   itemClassName = "",
-  align = "left" // "left" or "right"
+  align = "left" 
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);

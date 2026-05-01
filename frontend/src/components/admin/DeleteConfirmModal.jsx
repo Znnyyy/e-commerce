@@ -32,12 +32,12 @@ export default function DeleteConfirmModal({ product, onClose, onDeleted }) {
           className="bg-white rounded-4xl p-8 w-full max-w-sm shadow-2xl text-center"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Icon */}
+          
           <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
             <AlertTriangle size={24} className="text-red-500" />
           </div>
 
-          {/* Text */}
+          
           <h2 className="text-xl font-black tracking-tighter mb-2">Hapus Produk?</h2>
           <p className="text-sm font-medium opacity-50 mb-1">
             Kamu akan menghapus
@@ -49,7 +49,7 @@ export default function DeleteConfirmModal({ product, onClose, onDeleted }) {
             Tindakan ini tidak bisa dibatalkan. Semua variant akan ikut terhapus.
           </p>
 
-          {/* Actions */}
+          
           <div className="flex gap-3">
             <button
               onClick={onClose}

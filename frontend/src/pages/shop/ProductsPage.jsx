@@ -45,9 +45,8 @@ export default function ProductsPage() {
       exit={{ opacity: 0 }}
       className="w-full min-h-screen bg-brand-bg px-8 py-12"
     >
-      {/* Header */}
+      
       <div className="mb-12">
-        {hasFilter && (
           <Link
             to="/home"
             className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity mb-6"
@@ -55,7 +54,6 @@ export default function ProductsPage() {
             <ArrowLeft size={14} />
             Back to Store
           </Link>
-        )}
         <motion.h1
           initial={{ y: -16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -67,9 +65,9 @@ export default function ProductsPage() {
         <p className="opacity-50 text-sm mt-2 font-medium">{subtitle}</p>
       </div>
 
-      {/* Grid */}
+      
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
           {Array.from({ length: 10 }).map((_, i) => <ProductCardSkeleton key={i} />)}
         </div>
       ) : isError ? (
@@ -82,9 +80,15 @@ export default function ProductsPage() {
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"
         >
-          {products?.map(product => (
+          {products && [...products].sort((a, b) => {
+            const aStock = a.variants?.reduce((sum, v) => sum + v.stock, 0) || 0;
+            const bStock = b.variants?.reduce((sum, v) => sum + v.stock, 0) || 0;
+            if (aStock === 0 && bStock > 0) return 1;
+            if (aStock > 0 && bStock === 0) return -1;
+            return 0;
+          }).map(product => (
             <ProductCard key={product.id} product={product} itemVariants={itemVariants} />
           ))}
           {(!products || products.length === 0) && (

@@ -14,10 +14,10 @@ export default function CartRoute() {
     }
   }, [cart, navigate]);
 
-  // Masih loading → tunggu data cart
+  
   if (cart === null) return null;
 
-  // Sudah kosong → useEffect yang redirect, render null sementara
+  
   if (cart.items?.length === 0) return null;
 
   return <Outlet />;

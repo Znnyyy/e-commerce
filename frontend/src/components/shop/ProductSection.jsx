@@ -16,12 +16,19 @@ const containerVariants = {
   show: { opacity: 1, transition: { staggerChildren: 0.08 } },
 };
 
-export default function ProductSection({ title, subtitle, params = {}, viewAllLink, limit = 4 }) {
+export default function ProductSection({ title, subtitle, params = {}, viewAllLink, limit = 6 }) {
   const { data: products, isLoading } = useQuery({
     queryKey: ['products-section', params],
     queryFn: () => getProducts(params).then(res => {
       const data = Array.isArray(res.data) ? res.data : (res.data.data ?? []);
-      return data.slice(0, limit);
+      const sortedData = [...data].sort((a, b) => {
+        const aStock = a.variants?.reduce((sum, v) => sum + v.stock, 0) || 0;
+        const bStock = b.variants?.reduce((sum, v) => sum + v.stock, 0) || 0;
+        if (aStock === 0 && bStock > 0) return 1;
+        if (aStock > 0 && bStock === 0) return -1;
+        return 0;
+      });
+      return sortedData.slice(0, limit);
     }),
   });
 
@@ -46,7 +53,7 @@ export default function ProductSection({ title, subtitle, params = {}, viewAllLi
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
           {Array.from({ length: limit }).map((_, i) => <ProductCardSkeleton key={i} />)}
         </div>
       ) : (
@@ -54,7 +61,7 @@ export default function ProductSection({ title, subtitle, params = {}, viewAllLi
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"
         >
           {products.map(product => (
             <ProductCard key={product.id} product={product} itemVariants={itemVariants} />
