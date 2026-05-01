@@ -33,6 +33,7 @@ export default function ProductFormal({ product = null, onClose }) {
   const [form, setForm] = useState({
     name: product?.name || '',
     brand: product?.brand || '',
+    gender: product?.gender || 'Unisex',
     description: product?.description || '',
   });
 

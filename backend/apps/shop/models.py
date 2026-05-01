@@ -1,9 +1,15 @@
 from django.db import models
 
 class Product(models.Model):
+    GENDER_CHOICES = [
+        ('Men', 'Men'),
+        ('Women', 'Women'),
+        ('Unisex', 'Unisex'),
+    ]
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     brand = models.CharField(max_length=100, blank=True)
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='Unisex')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

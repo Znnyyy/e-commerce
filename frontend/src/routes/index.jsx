@@ -4,6 +4,7 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import LandingPage from "../pages/shop/LandingPage";
 import Home from "../pages/shop/Home";
 import ProductDetail from "../pages/shop/ProductDetail";
+import ProductsPage from "../pages/shop/ProductsPage";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <LandingPage /> },
           { path: "/home", element: <Home /> },
+          { path: "/products", element: <ProductsPage /> },
           { path: "/product/:id", element: <ProductDetail /> },
           {
             path: "/checkout",
