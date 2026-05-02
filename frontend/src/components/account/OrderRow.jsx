@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Package, Calendar, ChevronDown, ChevronUp, Box, CreditCard, RefreshCw } from "lucide-react";
+import { Package, Calendar, ChevronDown, ChevronUp, Box, CreditCard, RefreshCw, FileDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import StatusBadge from "../admin/orders/StatusBadge";
 import { formatRupiah } from "../../utils/format";
 import { syncOrder } from "../../api/api";
+import { downloadOrderInvoice } from "../../utils/exportPdf";
 
-export const OrderRow = ({ order, onStatusChange }) => {
+const OrderRow = ({ order, onStatusChange }) => {
   const [expanded, setExpanded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const navigate = useNavigate();
@@ -150,6 +151,14 @@ export const OrderRow = ({ order, onStatusChange }) => {
                   </div>
                 </div>
               ))}
+            </div>
+            <div className="px-4 sm:px-6 pb-4 flex justify-end">
+              <button
+                onClick={(e) => { e.stopPropagation(); downloadOrderInvoice(order); }}
+                className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-black/10 px-4 py-2 rounded-full hover:bg-black hover:text-white transition-all"
+              >
+                <FileDown size={14} /> Download Invoice
+              </button>
             </div>
           </motion.div>
         )}

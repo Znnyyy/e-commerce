@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Package, RefreshCw, Truck } from 'lucide-react';
+import { X, Package, RefreshCw, Truck, FileDown } from 'lucide-react';
 import { formatRupiah } from '../../../utils/format';
 import StatusBadge from './StatusBadge';
+import { downloadOrderInvoice } from '../../../utils/exportPdf';
 
 export default function OrderDetailPanel({ order, onClose, onStatusChange, onSyncMidtrans, updatingId }) {
 
@@ -105,6 +106,13 @@ export default function OrderDetailPanel({ order, onClose, onStatusChange, onSyn
           <p className="text-[10px] opacity-30 uppercase tracking-widest text-right">
             {new Date(order.created_at).toLocaleString('id-ID')}
           </p>
+
+          <button
+            onClick={() => downloadOrderInvoice(order)}
+            className="w-full flex items-center justify-center gap-2 border border-black/10 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all mt-2"
+          >
+            <FileDown size={14} /> Download Invoice
+          </button>
         </motion.div>
       </AnimatePresence>
     </motion.div>

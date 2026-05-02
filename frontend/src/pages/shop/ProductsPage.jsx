@@ -16,12 +16,14 @@ const itemVariants = {
 };
 
 function getPageTitle(params) {
+  if (params.search) return `Search: ${params.search}`;
   if (params.gender) return `${params.gender}'s Collection`;
   if (params.brand) return params.brand;
   return 'All Products';
 }
 
 function getPageSubtitle(params) {
+  if (params.search) return `Showing results for your search query.`;
   if (params.gender === 'Men') return 'Built for the streets.';
   if (params.gender === 'Women') return 'Step into something fresh.';
   if (params.gender === 'Unisex') return 'Classics that never go out of style.';

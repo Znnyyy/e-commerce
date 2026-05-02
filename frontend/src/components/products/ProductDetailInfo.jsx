@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ShoppingCart, Star } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { formatRupiah } from "../../utils/format";
 import useCartStore from "../../store/useCartStore";
 import useAuthStore from "../../store/useAuthStore";
 import ProductVariantSelector from "./ProductVariantSelector";
+import ProductDetailHeader from "./ProductDetailHeader";
+import ProductDetailSpecs from "./ProductDetailSpecs";
 
 export default function ProductDetailInfo({ product, selectedVariantId, setSelectedVariantId }) {
   const variants = product.variants || [];
@@ -73,24 +74,10 @@ export default function ProductDetailInfo({ product, selectedVariantId, setSelec
       transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
       className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center"
     >
-      <div className="mb-8 border-b border-black/10 pb-8">
-        <motion.h1 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none mb-4"
-        >
-          {product.name}
-        </motion.h1>
-        <motion.p 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="text-3xl font-bold"
-        >
-          {selectedVariant ? formatRupiah(selectedVariant.price) : 'Price Unavailable'}
-        </motion.p>
-      </div>
+      <ProductDetailHeader 
+        name={product.name} 
+        price={selectedVariant?.price} 
+      />
 
       <motion.div 
         initial={{ y: 20, opacity: 0 }}
@@ -98,43 +85,13 @@ export default function ProductDetailInfo({ product, selectedVariantId, setSelec
         transition={{ delay: 0.5 }}
         className="mb-10"
       >
-        <div className="flex items-center gap-1 mb-4 text-black">
-          <Star fill="currentColor" size={18} />
-          <Star fill="currentColor" size={18} />
-          <Star fill="currentColor" size={18} />
-          <Star fill="currentColor" size={18} />
-          <Star size={18} className="opacity-30" />
-          <span className="opacity-60 text-sm ml-2 font-medium">(128 Reviews)</span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-y-4 gap-x-8 mb-6 py-6 border-y border-black/10">
-          {product.brand && (
-            <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-widest font-bold opacity-50 mb-1">Brand</span>
-              <span className="font-bold text-sm">{product.brand}</span>
-            </div>
-          )}
-          {selectedVariant?.sku && (
-            <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-widest font-bold opacity-50 mb-1">SKU</span>
-              <span className="font-bold text-sm uppercase">{selectedVariant.sku}</span>
-            </div>
-          )}
-          {selectedVariant?.color && (
-            <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-widest font-bold opacity-50 mb-1">Colorway</span>
-              <span className="font-bold text-sm capitalize">{selectedVariant.color}</span>
-            </div>
-          )}
-        </div>
-
-        <p className="text-base opacity-80 leading-relaxed mb-6">
-          {product.description || "Designed for both performance and everyday wear. Features an incredibly comfortable sole and durable materials built to last. A true must-have classic."}
-        </p>
-        <div className="flex items-center gap-4 text-sm font-medium">
-          <span className="opacity-60 uppercase tracking-widest">Available Stock:</span>
-          <span className="font-bold text-lg">{selectedVariant ? selectedVariant.stock : 0}</span>
-        </div>
+        <ProductDetailSpecs
+          brand={product.brand}
+          sku={selectedVariant?.sku}
+          color={selectedVariant?.color}
+          description={product.description}
+          stock={selectedVariant ? selectedVariant.stock : 0}
+        />
 
         <ProductVariantSelector
           colors={colors}

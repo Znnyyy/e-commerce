@@ -1,0 +1,46 @@
+import React from 'react';
+import { Star } from 'lucide-react';
+
+export default function ProductDetailSpecs({ brand, sku, color, description, stock }) {
+  return (
+    <>
+      <div className="flex items-center gap-1 mb-4 text-black">
+        <Star fill="currentColor" size={18} />
+        <Star fill="currentColor" size={18} />
+        <Star fill="currentColor" size={18} />
+        <Star fill="currentColor" size={18} />
+        <Star size={18} className="opacity-30" />
+        <span className="opacity-60 text-sm ml-2 font-medium">(128 Reviews)</span>
+      </div>
+
+      <div className="grid grid-cols-2 gap-y-4 gap-x-8 mb-6 py-6 border-y border-black/10">
+        {brand && (
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-widest font-bold opacity-50 mb-1">Brand</span>
+            <span className="font-bold text-sm">{brand}</span>
+          </div>
+        )}
+        {sku && (
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-widest font-bold opacity-50 mb-1">SKU</span>
+            <span className="font-bold text-sm uppercase">{sku}</span>
+          </div>
+        )}
+        {color && (
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-widest font-bold opacity-50 mb-1">Colorway</span>
+            <span className="font-bold text-sm capitalize">{color}</span>
+          </div>
+        )}
+      </div>
+
+      <p className="text-base opacity-80 leading-relaxed mb-6">
+        {description || "Designed for both performance and everyday wear. Features an incredibly comfortable sole and durable materials built to last. A true must-have classic."}
+      </p>
+      <div className="flex items-center gap-4 text-sm font-medium">
+        <span className="opacity-60 uppercase tracking-widest">Available Stock:</span>
+        <span className="font-bold text-lg">{stock}</span>
+      </div>
+    </>
+  );
+}

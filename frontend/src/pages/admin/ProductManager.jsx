@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, FileSpreadsheet } from 'lucide-react';
 import { getProducts } from '../../api/api';
 import ProductFilters from '../../components/admin/ProductFilters';
 import ProductTable from '../../components/admin/ProductTable';
@@ -9,6 +9,7 @@ import ProductDetailPanel from '../../components/admin/ProductDetailPanel';
 import ProductFormal from '../../components/admin/ProductFormal';
 import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
 import QuickRestockModal from '../../components/admin/QuickRestockModal';
+import { exportProductsXlsx } from '../../utils/exportXlsx';
 
 const getStockStatus = (variants) => {
   if (!variants || variants.length === 0) return { label: 'No Stock', color: 'bg-black/10 text-black' };
@@ -81,6 +82,12 @@ export default function ProductManager() {
                 className="bg-brand-bg rounded-full py-2.5 pl-12 pr-4 text-sm font-medium outline-none border border-black/5 focus:border-black/20 w-64 transition-colors"
               />
             </div>
+            <button
+              onClick={() => exportProductsXlsx(filteredProducts)}
+              className="flex items-center gap-2 bg-brand-bg px-4 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black/10 transition-colors border border-black/5"
+            >
+              <FileSpreadsheet size={14} /> Export
+            </button>
             <button className="bg-black text-brand-bg px-6 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-2 hover:bg-black/80 transition-colors"
               onClick={() => setIsModalOpen(true)}>
               <Plus size={16} /> Add

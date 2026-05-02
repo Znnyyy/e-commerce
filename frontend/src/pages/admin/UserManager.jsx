@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ShieldCheck, UserCheck, UserX, RefreshCw, Users } from 'lucide-react';
+import { Search, ShieldCheck, UserCheck, RefreshCw, Users, FileSpreadsheet } from 'lucide-react';
 import api from '../../api/axios';
 import TableRowSkeleton from '../../components/ui/skeletons/TableRowSkeleton';
 import toast from 'react-hot-toast';
 import UserTable from './UserTable';
+import { exportUsersXlsx } from '../../utils/exportXlsx';
 
 export default function UserManager() {
   const [users, setUsers] = useState([]);
@@ -70,12 +71,20 @@ export default function UserManager() {
             {loading ? '—' : `${users.length} total · ${totalActive} active · ${totalStaff} staff`}
           </p>
         </div>
-        <button
-          onClick={fetchUsers}
-          className="flex items-center gap-2 bg-white border border-black/10 px-4 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black/5 transition-colors"
-        >
-          <RefreshCw size={14} /> Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => exportUsersXlsx(filtered)}
+            className="flex items-center gap-2 bg-white border border-black/10 px-4 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black/5 transition-colors"
+          >
+            <FileSpreadsheet size={14} /> Export
+          </button>
+          <button
+            onClick={fetchUsers}
+            className="flex items-center gap-2 bg-white border border-black/10 px-4 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black/5 transition-colors"
+          >
+            <RefreshCw size={14} /> Refresh
+          </button>
+        </div>
       </div>
 
       

@@ -1,5 +1,7 @@
 import React from 'react';
 import Field, { inputCls } from './Field';
+import Dropdown from '../../ui/Dropdown';
+import { User, Users, Sparkles } from 'lucide-react';
 
 export default function ProductInfoSection({ form, setForm }) {
   const handleChange = (e) => {
@@ -18,11 +20,17 @@ export default function ProductInfoSection({ form, setForm }) {
           <input name="brand" value={form.brand} onChange={handleChange} placeholder="Nike" className={inputCls} />
         </Field>
         <Field label="Gender">
-          <select name="gender" value={form.gender || 'Unisex'} onChange={handleChange} className={inputCls}>
-            <option value="Men">Men</option>
-            <option value="Women">Women</option>
-            <option value="Unisex">Unisex</option>
-          </select>
+          <Dropdown
+            value={form.gender || 'Unisex'}
+            onChange={(val) => setForm(prev => ({ ...prev, gender: val }))}
+            options={[
+              { value: 'Men', label: 'Men', Icon: User },
+              { value: 'Women', label: 'Women', Icon: Sparkles },
+              { value: 'Unisex', label: 'Unisex', Icon: Users },
+            ]}
+            className="w-full"
+            buttonClassName="w-full flex items-center justify-between !bg-brand-bg/50 !border-black/5 !rounded-xl !py-3 !px-4 !text-sm !font-bold !normal-case !tracking-normal shadow-none hover:!border-black/20"
+          />
         </Field>
       </div>
       <Field label="Description">

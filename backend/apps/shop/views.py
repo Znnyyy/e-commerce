@@ -1,8 +1,8 @@
-from django.shortcuts import render
+
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
+
 from .models import Product, ProductVariant, ProductImage
 from .serializers import ProductSerializer, ProductVariantSerializer, ProductImageSerializer
 
@@ -14,11 +14,19 @@ class ProductViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         gender = self.request.query_params.get('gender')
         brand = self.request.query_params.get('brand')
+        search = self.request.query_params.get('search')
         ordering = self.request.query_params.get('ordering', '-created_at')
+
         if gender:
             queryset = queryset.filter(gender__iexact=gender)
         if brand:
             queryset = queryset.filter(brand__iexact=brand)
+        if search:
+            from django.db.models import Q
+            queryset = queryset.filter(
+                Q(name__icontains=search) | Q(brand__icontains=search)
+            )
+
         allowed_orderings = ['created_at', '-created_at', 'name', '-name']
         if ordering in allowed_orderings:
             queryset = queryset.order_by(ordering)
