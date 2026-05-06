@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ProductDetailImage from '../../components/products/ProductDetailImage';
 import ProductDetailInfo from '../../components/products/ProductDetailInfo';
+import ProductReviews from '../../components/products/ProductReviews';
 import ProductDetailSkeleton from '../../components/ui/skeletons/ProductDetailSkeleton';
 
 export default function ProductDetail() {
@@ -34,18 +35,28 @@ export default function ProductDetail() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="w-full min-h-[calc(100vh-89px)] bg-brand-bg flex flex-col md:flex-row"
-    >
-      <ProductDetailImage product={product} />
-      <ProductDetailInfo
-        product={product}
-        selectedVariantId={selectedVariantId}
-        setSelectedVariantId={setSelectedVariantId}
-      />
-    </motion.div>
+    <div className="bg-brand-bg w-full min-h-screen">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="flex flex-col md:flex-row"
+      >
+        <ProductDetailImage product={product} />
+        <ProductDetailInfo
+          product={product}
+          selectedVariantId={selectedVariantId}
+          setSelectedVariantId={setSelectedVariantId}
+        />
+      </motion.div>
+      
+      <div className="max-w-7xl mx-auto px-8 pb-20">
+        <ProductReviews 
+          productId={product.id} 
+          productName={product.name}
+          canReview={product.can_review}
+        />
+      </div>
+    </div>
   );
 }

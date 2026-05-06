@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
-import { Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import RatingStars from '../ui/RatingStars';
 
-export default function ProductDetailSpecs({ brand, sku, color, description, stock }) {
+export default function ProductDetailSpecs({ brand, sku, color, description, stock, averageRating, reviewCount }) {
   const [isDescOpen, setIsDescOpen] = useState(false);
 
   return (
     <>
-      <div className="flex items-center gap-1 mb-4 text-black">
-        <Star fill="currentColor" size={18} />
-        <Star fill="currentColor" size={18} />
-        <Star fill="currentColor" size={18} />
-        <Star fill="currentColor" size={18} />
-        <Star size={18} className="opacity-30" />
-        <span className="opacity-60 text-sm ml-2 font-medium">(128 Reviews)</span>
+      <div className="flex items-center gap-3 mb-6">
+        <RatingStars rating={averageRating} size={18} />
+        <span className="opacity-60 text-sm font-medium tracking-tight">({reviewCount} Reviews)</span>
       </div>
 
       <div className="grid grid-cols-2 gap-y-4 gap-x-8 mb-6 py-6 border-y border-black/10">

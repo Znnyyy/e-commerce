@@ -8,6 +8,8 @@ import { formatRupiah } from "../../utils/format";
 import { syncOrder } from "../../api/api";
 import { downloadOrderInvoice } from "../../utils/exportPdf";
 
+import ReviewModal from "./ReviewModal";
+
 const OrderRow = ({ order, onStatusChange }) => {
   const [expanded, setExpanded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);

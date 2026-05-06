@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getProducts } from '../../api/api';
 import ProductCard from '../products/ProductCard';
 import ProductCardSkeleton from '../ui/skeletons/ProductCardSkeleton';
+import NoProductsFound from '../ui/NoProductsFound';
 
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -16,7 +17,7 @@ const containerVariants = {
   show: { opacity: 1, transition: { staggerChildren: 0.08 } },
 };
 
-export default function ProductSection({ title, subtitle, params = {}, viewAllLink, limit = 6 }) {
+export default function ProductSection({ title, subtitle, params = {}, viewAllLink, limit = 6, silentEmpty = false }) {
   const { data: products, isLoading } = useQuery({
     queryKey: ['products-section', params],
     queryFn: () => getProducts(params).then(res => {
@@ -32,7 +33,10 @@ export default function ProductSection({ title, subtitle, params = {}, viewAllLi
     }),
   });
 
-  if (!isLoading && (!products || products.length === 0)) return null;
+  if (!isLoading && (!products || products.length === 0)) {
+    if (silentEmpty) return null;
+    return <NoProductsFound />;
+  }
 
   return (
     <section className="w-full mb-20">

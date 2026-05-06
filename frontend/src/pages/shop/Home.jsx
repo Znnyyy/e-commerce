@@ -29,6 +29,7 @@ export default function Home() {
         params={{ gender: 'Men', ordering: '-created_at' }}
         viewAllLink="/products?gender=Men"
         limit={6}
+        silentEmpty={true}
       />
 
       
@@ -38,6 +39,7 @@ export default function Home() {
         params={{ gender: 'Women', ordering: '-created_at' }}
         viewAllLink="/products?gender=Women"
         limit={6}
+        silentEmpty={true}
       />
 
       
@@ -47,6 +49,7 @@ export default function Home() {
         params={{ gender: 'Unisex', ordering: '-created_at' }}
         viewAllLink="/products?gender=Unisex"
         limit={6}
+        silentEmpty={true}
       />
     </motion.div>
   );

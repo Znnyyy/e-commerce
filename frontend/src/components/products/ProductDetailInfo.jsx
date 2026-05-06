@@ -8,6 +8,7 @@ import useAuthStore from "../../store/useAuthStore";
 import ProductVariantSelector from "./ProductVariantSelector";
 import ProductDetailHeader from "./ProductDetailHeader";
 import ProductDetailSpecs from "./ProductDetailSpecs";
+import RatingStars from "../ui/RatingStars";
 
 export default function ProductDetailInfo({ product, selectedVariantId, setSelectedVariantId }) {
   const variants = product.variants || [];
@@ -91,6 +92,8 @@ export default function ProductDetailInfo({ product, selectedVariantId, setSelec
           color={selectedVariant?.color}
           description={product.description}
           stock={selectedVariant ? selectedVariant.stock : 0}
+          averageRating={product.average_rating}
+          reviewCount={product.review_count}
         />
 
         <ProductVariantSelector

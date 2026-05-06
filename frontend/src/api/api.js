@@ -28,3 +28,6 @@ export const syncOrder = (id) => api.post(`/orders/${id}/sync_midtrans/`);
 export const updateProfile = (data) => api.patch('/users/me/', data, {
   headers: { 'Content-Type': 'multipart/form-data' }
 });
+
+export const getProductReviews = (productId) => api.get('/reviews/', { params: { product: productId } });
+export const submitReview = (data) => api.post('/reviews/', data);

@@ -13,7 +13,6 @@ export default function AccountPage() {
   const { user, isAuthenticated, logout } = useAuthStore();
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
-  const [activeTab, setActiveTab] = useState('orders');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
@@ -102,8 +101,6 @@ export default function AccountPage() {
         </div>
 
         <AccountTabs 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
           orders={orders} 
           loadingOrders={loadingOrders} 
           onStatusChange={fetchOrders} 

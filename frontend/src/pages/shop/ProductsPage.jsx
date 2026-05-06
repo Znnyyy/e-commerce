@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useProducts } from '../../hooks/useProducts';
 import ProductCard from '../../components/products/ProductCard';
 import ProductCardSkeleton from '../../components/ui/skeletons/ProductCardSkeleton';
+import NoProductsFound from '../../components/ui/NoProductsFound';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -94,9 +95,8 @@ export default function ProductsPage() {
             <ProductCard key={product.id} product={product} itemVariants={itemVariants} />
           ))}
           {(!products || products.length === 0) && (
-            <div className="col-span-full py-40 flex flex-col items-center justify-center opacity-40">
-              <p className="font-black text-xl uppercase tracking-tight">No products found</p>
-              <p className="text-sm mt-1">Try a different filter or browse all products.</p>
+            <div className="col-span-full">
+              <NoProductsFound />
             </div>
           )}
         </motion.div>

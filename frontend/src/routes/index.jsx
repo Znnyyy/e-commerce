@@ -11,6 +11,7 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import ProductManager from "../pages/admin/ProductManager";
 import OrderManager from "../pages/admin/OrderManager";
 import UserManager from "../pages/admin/UserManager";
+import ReviewManager from "../pages/admin/ReviewManager";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import CartRoute from "../components/auth/CartRoute";
 import Checkout from "../pages/cart/Checkout";
@@ -66,6 +67,10 @@ export const router = createBrowserRouter([
           {
             path: "orders",
             element: <OrderManager />
+          },
+          {
+            path: "reviews",
+            element: <ReviewManager />
           },
           {
             path: "users",
