@@ -4,6 +4,8 @@ import { X, Upload, Loader2, User } from 'lucide-react';
 import { updateProfile } from '../../api/api';
 import useAuthStore from '../../store/useAuthStore';
 import toast from 'react-hot-toast';
+import { useCloudinaryUpload } from '../../hooks/useCloudinaryUpload';
+import { getImageUrl } from '../../api/axios';
 
 export default function EditProfileModal({ onClose }) {
   const { user, updateUser } = useAuthStore();
@@ -11,6 +13,7 @@ export default function EditProfileModal({ onClose }) {
   const [avatar, setAvatar] = useState(null);
   const [preview, setPreview] = useState(null);
   const fileInputRef = useRef(null);
+  const { upload: uploadToCloudinary } = useCloudinaryUpload();
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -24,11 +27,14 @@ export default function EditProfileModal({ onClose }) {
     e.preventDefault();
     setLoading(true);
 
-    const formData = new FormData();
-    if (avatar) formData.append('avatar', avatar);
-
     try {
-      const res = await updateProfile(formData);
+      let avatarUrl = user?.profile?.avatar;
+      
+      if (avatar) {
+        avatarUrl = await uploadToCloudinary(avatar);
+      }
+
+      const res = await updateProfile({ avatar: avatarUrl });
       updateUser(res.data);
       toast.success('Profile updated successfully');
       onClose();
@@ -72,7 +78,7 @@ export default function EditProfileModal({ onClose }) {
               {preview ? (
                 <img src={preview} alt="Preview" className="w-full h-full object-cover" />
               ) : user?.profile?.avatar ? (
-                <img src={user.profile.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                <img src={getImageUrl(user.profile.avatar)} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
                 <User size={48} className="text-black/20" />
               )}

@@ -19,8 +19,8 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
     def patch(self, request, *args, **kwargs):
         user = self.get_object()
         
-        # Handle avatar upload
-        avatar = request.FILES.get('avatar')
+        # Handle avatar (could be file or URL)
+        avatar = request.FILES.get('avatar') or request.data.get('avatar')
         if avatar:
             # Ensure profile exists
             if not hasattr(user, 'profile'):

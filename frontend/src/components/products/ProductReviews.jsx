@@ -4,6 +4,7 @@ import { MessageSquare, User as UserIcon } from 'lucide-react';
 import { getProductReviews } from '../../api/api';
 import RatingStars from '../ui/RatingStars';
 import ReviewModal from '../account/ReviewModal';
+import { getImageUrl } from '../../api/axios';
 
 export default function ProductReviews({ productId, productName, canReview, onReviewSuccess }) {
   const [reviews, setReviews] = useState([]);
@@ -68,7 +69,7 @@ export default function ProductReviews({ productId, productName, canReview, onRe
           </div>
         )
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {reviews.map((review, idx) => (
             <motion.div 
               key={review.id}
@@ -82,7 +83,7 @@ export default function ProductReviews({ productId, productName, canReview, onRe
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-brand-bg flex items-center justify-center overflow-hidden border border-black/5">
                     {review.avatar ? (
-                      <img src={review.avatar} alt={review.username} className="w-full h-full object-cover" />
+                      <img src={getImageUrl(review.avatar)} alt={review.username} className="w-full h-full object-cover" />
                     ) : (
                       <UserIcon size={20} className="opacity-20" />
                     )}

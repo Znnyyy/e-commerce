@@ -50,7 +50,7 @@ export default function ProductDetail() {
         />
       </motion.div>
       
-      <div className="max-w-7xl mx-auto px-8 pb-20">
+      <div className="max-w-8xl mx-auto px-8 pb-20">
         <ProductReviews 
           productId={product.id} 
           productName={product.name}

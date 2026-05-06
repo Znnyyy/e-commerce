@@ -14,7 +14,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     username = serializers.ReadOnlyField(source='user.username')
-    avatar = serializers.ImageField(source='user.profile.avatar', read_only=True)
+    avatar = serializers.URLField(source='user.profile.avatar', read_only=True)
     product_name = serializers.ReadOnlyField(source='product.name')
     product_image = serializers.SerializerMethodField()
 

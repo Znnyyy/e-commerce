@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+
 
 const STORE = {
   name: 'SNEAKERS.',
@@ -13,7 +13,7 @@ const STORE = {
 const COLORS = {
   black:       [10,  10,  10],
   white:       [255, 255, 255],
-  accent:      [230, 180, 80],   // gold accent
+  accent:      [230, 180, 80],
   lightGray:   [248, 248, 248],
   midGray:     [160, 160, 160],
   darkGray:    [60,  60,  60],
@@ -32,11 +32,11 @@ const FONT = {
 
 const PAGE = {
   margin: 18,
-  width:  210,   // A4 mm
+  width:  210,
   height: 297,
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 
 function formatRupiah(value) {
   return new Intl.NumberFormat('id-ID', {
@@ -68,57 +68,57 @@ function setColor(doc, rgb) {
   doc.setTextColor(...rgb);
 }
 
-// ─── Section Renderers ────────────────────────────────────────────────────────
 
-/** Renders the full-width header band with store name + invoice info */
+
+
 function renderHeader(doc, order) {
   const { margin, width } = PAGE;
   const statusLabel = getStatusLabel(order.status);
   const statusColor = COLORS.status[statusLabel] ?? COLORS.midGray;
 
-  // Black header band
+
   doc.setFillColor(...COLORS.black);
   doc.rect(0, 0, width, 46, 'F');
 
-  // Gold left accent bar
+
   doc.setFillColor(...COLORS.accent);
   doc.rect(0, 0, 4, 46, 'F');
 
-  // Store name
+
   setFont(doc, 'bold', 20);
   setColor(doc, COLORS.white);
   doc.text(STORE.name, margin + 4, 18);
 
-  // Tagline
+
   setFont(doc, 'normal', 7.5);
   setColor(doc, COLORS.midGray);
   doc.text(STORE.tagline, margin + 4, 25);
 
-  // Thin gold separator line under tagline
+
   doc.setDrawColor(...COLORS.accent);
   doc.setLineWidth(0.3);
   doc.line(margin + 4, 28, margin + 60, 28);
 
-  // Store contact info
+
   setFont(doc, 'normal', 6.5);
   setColor(doc, COLORS.midGray);
   doc.text(`${STORE.website}  ·  ${STORE.email}`, margin + 4, 33);
 
-  // "INVOICE" label (right)
+
   setFont(doc, 'bold', 22);
   setColor(doc, COLORS.white);
   doc.text('INVOICE', width - margin, 18, { align: 'right' });
 
-  // Invoice number
+
   setFont(doc, 'normal', 8);
   setColor(doc, COLORS.midGray);
   doc.text(`#${order.id}`, width - margin, 25, { align: 'right' });
 
-  // Date
+
   setFont(doc, 'normal', 7);
   doc.text(formatDate(order.created_at), width - margin, 31, { align: 'right' });
 
-  // Status badge
+
   const badgeW = 28;
   const badgeH = 7;
   const badgeX = width - margin - badgeW;
@@ -130,22 +130,22 @@ function renderHeader(doc, order) {
   doc.text(statusLabel, badgeX + badgeW / 2, badgeY + 4.8, { align: 'center' });
 }
 
-/** Renders SHIP TO and ORDER INFO side-by-side cards */
+
 function renderInfoCards(doc, order, startY) {
   const { margin, width } = PAGE;
   const cardW = (width - margin * 2 - 6) / 2;
   const cardH = 44;
   const r = 3;
 
-  // ── Ship To Card ──
+
   const lx = margin;
   doc.setFillColor(...COLORS.lightGray);
   doc.roundedRect(lx, startY, cardW, cardH, r, r, 'F');
 
-  // Gold top bar on card
+
   doc.setFillColor(...COLORS.accent);
   doc.roundedRect(lx, startY, cardW, 5, r, r, 'F');
-  doc.rect(lx, startY + 2, cardW, 3, 'F'); // fill bottom corners of top bar
+  doc.rect(lx, startY + 2, cardW, 3, 'F');
 
   setFont(doc, 'bold', 6.5);
   setColor(doc, COLORS.black);
@@ -163,7 +163,7 @@ function renderInfoCards(doc, order, startY) {
   doc.text(addressLines, lx + 5, startY + 25.5);
   doc.text(order.shipping_city, lx + 5, startY + 38);
 
-  // ── Order Info Card ──
+
   const rx = margin + cardW + 6;
   doc.setFillColor(...COLORS.lightGray);
   doc.roundedRect(rx, startY, cardW, cardH, r, r, 'F');
@@ -196,7 +196,7 @@ function renderInfoCards(doc, order, startY) {
   return startY + cardH + 8;
 }
 
-/** Renders the items table */
+
 function renderItemsTable(doc, order, startY) {
   const { margin } = PAGE;
 
@@ -211,8 +211,7 @@ function renderItemsTable(doc, order, startY) {
     formatRupiah(item.price * item.quantity),
   ]);
 
-  // Total usable width = PAGE.width - margin*2 = 210 - 36 = 174mm
-  // Col widths: # 10 | Product auto | Variant 38 | Qty 14 | Unit Price 36 | Subtotal 36
+
   autoTable(doc, {
     startY,
     head: [['#', 'Product', 'Variant', 'Qty', 'Unit Price', 'Subtotal']],
@@ -250,7 +249,7 @@ function renderItemsTable(doc, order, startY) {
   return doc.lastAutoTable.finalY;
 }
 
-/** Renders the total amount box */
+
 function renderTotal(doc, order, afterTableY) {
   const { margin, width } = PAGE;
   const boxW  = 80;
@@ -258,15 +257,15 @@ function renderTotal(doc, order, afterTableY) {
   const boxX  = width - margin - boxW;
   const boxY  = afterTableY + 8;
 
-  // Gold top stripe
+
   doc.setFillColor(...COLORS.accent);
   doc.roundedRect(boxX, boxY, boxW, 5, 2, 2, 'F');
   doc.rect(boxX, boxY + 2, boxW, 3, 'F');
 
-  // Black body
+
   doc.setFillColor(...COLORS.black);
   doc.roundedRect(boxX, boxY + 3, boxW, boxH, 2, 2, 'F');
-  doc.rect(boxX, boxY + 3, boxW, 4, 'F'); // merge with stripe
+  doc.rect(boxX, boxY + 3, boxW, 4, 'F');
 
   setFont(doc, 'normal', 6.5);
   setColor(doc, COLORS.midGray);
@@ -277,12 +276,12 @@ function renderTotal(doc, order, afterTableY) {
   doc.text(formatRupiah(order.total_amount), boxX + boxW - 5, boxY + 19, { align: 'right' });
 }
 
-/** Renders the page footer */
+
 function renderFooter(doc) {
   const { width, height, margin } = PAGE;
   const y = height - 12;
 
-  // Thin gold top line
+
   doc.setDrawColor(...COLORS.accent);
   doc.setLineWidth(0.4);
   doc.line(margin, y - 3, width - margin, y - 3);
@@ -296,12 +295,9 @@ function renderFooter(doc) {
   doc.text('Thank you for your purchase!', width / 2, y + 6, { align: 'center' });
 }
 
-// ─── Public API ───────────────────────────────────────────────────────────────
 
-/**
- * Generate and download an invoice PDF for the given order.
- * @param {object} order - Order data object
- */
+
+
 export function downloadOrderInvoice(order) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 

@@ -97,8 +97,13 @@ export default function ProductFormal({ product = null, onClose }) {
     setNewFiles(prev => prev.map((f, i) => ({ ...f, isPrimary: i === idx })));
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
     setError(null);
     try {
       const productRes = await productMutation.mutateAsync(form);
@@ -131,10 +136,12 @@ export default function ProductFormal({ product = null, onClose }) {
       const msg = err?.response?.data?.detail || 'Something went wrong.';
       setError(msg);
       toast.error(msg);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const isLoading = productMutation.isPending;
+  const isLoading = isSubmitting;
 
   return (
     <AnimatePresence>

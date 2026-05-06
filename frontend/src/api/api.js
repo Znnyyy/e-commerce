@@ -25,9 +25,7 @@ export const clearCart = () => api.delete('/cart/clear/');
 export const getMyOrders = () => api.get('/orders/');
 export const syncOrder = (id) => api.post(`/orders/${id}/sync_midtrans/`);
 
-export const updateProfile = (data) => api.patch('/users/me/', data, {
-  headers: { 'Content-Type': 'multipart/form-data' }
-});
+export const updateProfile = (data) => api.patch('/users/me/', data);
 
 export const getProductReviews = (productId) => api.get('/reviews/', { params: { product: productId } });
 export const submitReview = (data) => api.post('/reviews/', data);
