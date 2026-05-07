@@ -2,7 +2,8 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action, api_view, permission_classes as deco_permission_classes
 from django.db import transaction
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, F
+from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from .models import Order, OrderItem
@@ -23,10 +24,10 @@ def get_snap_client():
 
 
 def rollback_stock(order):
+    """Restore stock for failed orders using atomic F() expressions"""
     for item in order.items.all():
         if item.variant:
-            item.variant.stock += item.quantity
-            item.variant.save()
+            ProductVariant.objects.filter(id=item.variant.id).update(stock=F('stock') + item.quantity)
 
 
 def apply_midtrans_status(order, transaction_status, fraud_status):
@@ -110,14 +111,21 @@ class OrderViewSet(viewsets.ModelViewSet):
         except Cart.DoesNotExist:
             return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
 
-        cart_items = cart.items.all()
+        cart_items = list(cart.items.all())
         if not cart_items:
             return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Collect all variant IDs and lock them for update
+        variant_ids = [item.variant.id for item in cart_items]
+        variants_to_update = ProductVariant.objects.filter(id__in=variant_ids).select_for_update()
+        variants_dict = {v.id: v for v in variants_to_update}
+
+        # Check stock availability with row-level lock
         for item in cart_items:
-            if item.variant.stock < item.quantity:
+            variant = variants_dict.get(item.variant.id)
+            if not variant or variant.stock < item.quantity:
                 return Response(
-                    {"error": f"Not enough stock for {item.variant.product.name} ({item.variant.size}). Available: {item.variant.stock}"},
+                    {"error": f"Not enough stock for {item.variant.product.name} ({item.variant.size}). Available: {variant.stock if variant else 0}"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
@@ -130,10 +138,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         total_amount = 0
         item_details = []
 
+        # Update stock using F() expressions to prevent race conditions
         for item in cart_items:
-            variant = item.variant
-            variant.stock -= item.quantity
-            variant.save()
+            variant = variants_dict[item.variant.id]
+            # Use F() expression for atomic update
+            ProductVariant.objects.filter(id=variant.id).update(stock=F('stock') - item.quantity)
 
             subtotal = variant.price * item.quantity
             total_amount += subtotal
