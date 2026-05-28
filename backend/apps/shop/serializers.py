@@ -56,7 +56,6 @@ class ProductSerializer(serializers.ModelSerializer):
         if not request or not request.user.is_authenticated:
             return None
 
-        # Check if user has purchased this product in any order that is paid or shipped
         from apps.orders.models import Order
         purchased_orders = Order.objects.filter(
             user=request.user,
@@ -67,9 +66,8 @@ class ProductSerializer(serializers.ModelSerializer):
         if not purchased_orders.exists():
             return None
 
-        # Find orders that don't have a review for this product yet
         for order in purchased_orders:
             if not obj.reviews.filter(user=request.user, order=order).exists():
-                return order.id # Return the first eligible order ID
+                return order.id
         
         return None

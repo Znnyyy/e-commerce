@@ -12,6 +12,7 @@ export default function EditProfileModal({ onClose }) {
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [email, setEmail] = useState(user?.email || '');
   const fileInputRef = useRef(null);
   const { upload: uploadToCloudinary } = useCloudinaryUpload();
 
@@ -34,7 +35,12 @@ export default function EditProfileModal({ onClose }) {
         avatarUrl = await uploadToCloudinary(avatar);
       }
 
-      const res = await updateProfile({ avatar: avatarUrl });
+      const updateData = { email };
+      if (avatarUrl) {
+        updateData.avatar = avatarUrl;
+      }
+
+      const res = await updateProfile(updateData);
       updateUser(res.data);
       toast.success('Profile updated successfully');
       onClose();
@@ -110,9 +116,10 @@ export default function EditProfileModal({ onClose }) {
               <label className="block text-[10px] font-bold uppercase tracking-widest opacity-40 mb-2">Email Address</label>
               <input 
                 type="email" 
-                disabled 
-                value={user?.email || ''} 
-                className="w-full bg-brand-bg/50 border border-black/5 px-4 py-3 rounded-xl font-bold text-sm opacity-50 cursor-not-allowed"
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full bg-brand-bg/50 border border-black/5 px-4 py-3 rounded-xl font-bold text-sm focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all"
               />
             </div>
           </div>

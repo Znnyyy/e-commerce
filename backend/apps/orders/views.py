@@ -10,6 +10,7 @@ from .models import Order, OrderItem
 from .serializers import OrderSerializer
 from apps.cart.models import Cart
 from apps.shop.models import ProductVariant
+from apps.users.permissions import IsSuperAdmin
 import midtransclient
 import uuid
 import hashlib
@@ -57,7 +58,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Order.objects.all().order_by('-created_at')
         return Order.objects.filter(user=user).order_by('-created_at')
 
-    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
+    @action(detail=False, methods=['get'], permission_classes=[IsSuperAdmin])
     def dashboard_stats(self, request):
         from django.contrib.auth.models import User
         from django.db.models.functions import TruncMonth
@@ -115,12 +116,10 @@ class OrderViewSet(viewsets.ModelViewSet):
         if not cart_items:
             return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Collect all variant IDs and lock them for update
         variant_ids = [item.variant.id for item in cart_items]
         variants_to_update = ProductVariant.objects.filter(id__in=variant_ids).select_for_update()
         variants_dict = {v.id: v for v in variants_to_update}
 
-        # Check stock availability with row-level lock
         for item in cart_items:
             variant = variants_dict.get(item.variant.id)
             if not variant or variant.stock < item.quantity:
@@ -138,10 +137,8 @@ class OrderViewSet(viewsets.ModelViewSet):
         total_amount = 0
         item_details = []
 
-        # Update stock using F() expressions to prevent race conditions
         for item in cart_items:
             variant = variants_dict[item.variant.id]
-            # Use F() expression for atomic update
             ProductVariant.objects.filter(id=variant.id).update(stock=F('stock') - item.quantity)
 
             subtotal = variant.price * item.quantity

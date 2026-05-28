@@ -43,6 +43,21 @@ export default function UserManager() {
     }
   };
 
+  const handleRoleChange = async (user, newRole) => {
+    setTogglingId(`role-${user.id}`);
+    try {
+      const res = await api.patch(`/users/list/${user.id}/`, { role: newRole });
+      setUsers(prev => prev.map(u =>
+        u.id === user.id ? { ...u, is_staff: res.data.is_staff, is_superuser: res.data.is_superuser } : u
+      ));
+      toast.success(`Role updated to ${newRole}`);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to update user role');
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
   const filtered = users.filter(u => {
     const matchSearch =
       u.username.toLowerCase().includes(search.toLowerCase()) ||
@@ -133,6 +148,7 @@ export default function UserManager() {
           users={filtered}
           togglingId={togglingId}
           onToggleActive={handleToggleActive}
+          onRoleChange={handleRoleChange}
         />
       </div>
     </motion.div>

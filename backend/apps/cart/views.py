@@ -13,13 +13,13 @@ class CartViewSet(viewsets.ViewSet):
         cart, _ = Cart.objects.get_or_create(user=user)
         return cart
 
-    # GET /api/cart/  → ambil seluruh isi cart
+
     def list(self, request):
         cart = self._get_or_create_cart(request.user)
         serializer = CartSerializer(cart, context={'request': request})
         return Response(serializer.data)
 
-    # POST /api/cart/add/  → tambah item ke cart
+
     @action(detail=False, methods=['post'], url_path='add')
     def add_item(self, request):
         cart = self._get_or_create_cart(request.user)
@@ -50,7 +50,7 @@ class CartViewSet(viewsets.ViewSet):
         serializer = CartSerializer(cart, context={'request': request})
         return Response(serializer.data, status=200)
 
-    # PATCH /api/cart/update/{item_id}/  → ubah quantity
+
     @action(detail=False, methods=['patch'], url_path='update/(?P<item_id>[^/.]+)')
     def update_item(self, request, item_id=None):
         cart = self._get_or_create_cart(request.user)
@@ -72,7 +72,7 @@ class CartViewSet(viewsets.ViewSet):
         serializer = CartSerializer(cart, context={'request': request})
         return Response(serializer.data)
 
-    # DELETE /api/cart/remove/{item_id}/  → hapus satu item
+
     @action(detail=False, methods=['delete'], url_path='remove/(?P<item_id>[^/.]+)')
     def remove_item(self, request, item_id=None):
         cart = self._get_or_create_cart(request.user)
@@ -85,7 +85,7 @@ class CartViewSet(viewsets.ViewSet):
         serializer = CartSerializer(cart, context={'request': request})
         return Response(serializer.data)
 
-    # DELETE /api/cart/clear/  → kosongkan semua
+
     @action(detail=False, methods=['delete'], url_path='clear')
     def clear_cart(self, request):
         cart = self._get_or_create_cart(request.user)

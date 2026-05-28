@@ -11,6 +11,8 @@ import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
 import QuickRestockModal from '../../components/admin/QuickRestockModal';
 import { exportProductsXlsx } from '../../utils/exportXlsx';
 
+import useAuthStore from '../../store/useAuthStore';
+
 const getStockStatus = (variants) => {
   if (!variants || variants.length === 0) return { label: 'No Stock', color: 'bg-black/10 text-black' };
   const total = variants.reduce((acc, v) => acc + v.stock, 0);
@@ -30,6 +32,7 @@ const getBasePrice = (variants) => {
 };
 
 export default function ProductManager() {
+  const { user } = useAuthStore();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('any');
@@ -88,10 +91,12 @@ export default function ProductManager() {
             >
               <FileSpreadsheet size={14} /> Export
             </button>
-            <button className="bg-black text-brand-bg px-6 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-2 hover:bg-black/80 transition-colors"
-              onClick={() => setIsModalOpen(true)}>
-              <Plus size={16} /> Add
-            </button>
+            {user?.is_superuser && (
+              <button className="bg-black text-brand-bg px-6 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-2 hover:bg-black/80 transition-colors"
+                onClick={() => setIsModalOpen(true)}>
+                <Plus size={16} /> Add
+              </button>
+            )}
           </div>
         </div>
 
@@ -114,6 +119,7 @@ export default function ProductManager() {
           getStockStatus={getStockStatus}
           getTotalStock={getTotalStock}
           getBasePrice={getBasePrice}
+          isSuperAdmin={user?.is_superuser}
         />
       </motion.div>
 
@@ -131,6 +137,7 @@ export default function ProductManager() {
         {(isModalOpen || editProduct) && (
           <ProductFormal
             product={editProduct || null}
+            isSuperAdmin={user?.is_superuser}
             onClose={() => {
               setIsModalOpen(false);
               setEditProduct(null);

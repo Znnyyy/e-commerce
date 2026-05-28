@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from .serializers import RegisterSerializer, UserSerializer
+from .permissions import IsSuperAdmin
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -19,10 +20,8 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
     def patch(self, request, *args, **kwargs):
         user = self.get_object()
         
-        # Handle avatar (could be file or URL)
         avatar = request.FILES.get('avatar') or request.data.get('avatar')
         if avatar:
-            # Ensure profile exists
             if not hasattr(user, 'profile'):
                 from .models import UserProfile
                 UserProfile.objects.create(user=user)
@@ -32,7 +31,7 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
         return super().patch(request, *args, **kwargs)
 
 class UserListView(APIView):
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = (IsSuperAdmin,)
 
     def get(self, request):
         users = User.objects.order_by('-date_joined').values(
@@ -46,8 +45,30 @@ class UserListView(APIView):
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=404)
+            
         is_active = request.data.get('is_active')
         if is_active is not None:
             user.is_active = is_active
-            user.save()
-        return Response({'id': user.id, 'is_active': user.is_active})
+            
+        role = request.data.get('role')
+        if role:
+            if user == request.user and role != 'superadmin':
+                return Response({'error': 'Cannot downgrade your own superadmin role'}, status=400)
+                
+            if role == 'superadmin':
+                user.is_staff = True
+                user.is_superuser = True
+            elif role == 'staff' or role == 'admin':
+                user.is_staff = True
+                user.is_superuser = False
+            elif role == 'customer' or role == 'user':
+                user.is_staff = False
+                user.is_superuser = False
+
+        user.save()
+        return Response({
+            'id': user.id, 
+            'is_active': user.is_active,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser
+        })

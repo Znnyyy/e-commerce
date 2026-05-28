@@ -74,7 +74,13 @@ export const router = createBrowserRouter([
           },
           {
             path: "users",
-            element: <UserManager />
+            element: <ProtectedRoute requireSuperadmin={true} />,
+            children: [
+              {
+                index: true,
+                element: <UserManager />
+              }
+            ]
           }
         ]
       }

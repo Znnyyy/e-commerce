@@ -2,7 +2,7 @@ import { Edit3, Trash2, PackageOpen, PackagePlus } from 'lucide-react';
 import { getImageUrl } from '../../api/axios';
 import TableRowSkeleton from '../ui/skeletons/TableRowSkeleton';
 
-export default function ProductTable({ products, isLoading, selectedProductId, onRowClick, onEdit, onDelete, onRestock, getStockStatus, getTotalStock, getBasePrice }) {
+export default function ProductTable({ products, isLoading, selectedProductId, onRowClick, onEdit, onDelete, onRestock, getStockStatus, getTotalStock, getBasePrice, isSuperAdmin }) {
   return (
     <div className="flex-1 overflow-auto rounded-2xl border border-black/5">
       <table className="w-full text-left border-collapse text-sm">
@@ -68,13 +68,15 @@ export default function ProductTable({ products, isLoading, selectedProductId, o
                     >
                       <Edit3 size={16} />
                     </button>
-                    <button
-                      className="p-2 text-red-400 hover:text-white hover:bg-red-500 rounded-full transition-colors inline-flex"
-                      onClick={(e) => { e.stopPropagation(); onDelete(prod); }}
-                      title="Delete Product"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    {isSuperAdmin && (
+                      <button
+                        className="p-2 text-red-400 hover:text-white hover:bg-red-500 rounded-full transition-colors inline-flex"
+                        onClick={(e) => { e.stopPropagation(); onDelete(prod); }}
+                        title="Delete Product"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
                   </td>
                 </tr>
               );

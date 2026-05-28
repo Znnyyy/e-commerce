@@ -17,10 +17,8 @@ class OrderVariantSerializer(serializers.ModelSerializer):
             primary = obj.product.images.first()
         if primary and primary.image:
             image = primary.image
-            # Cloudinary menyimpan sebagai string URL langsung
             if isinstance(image, str):
                 return image
-            # Fallback untuk ImageField lama
             try:
                 return image.url
             except Exception:

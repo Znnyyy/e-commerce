@@ -8,11 +8,12 @@ from .serializers import (
     ProductSerializer, ProductVariantSerializer, 
     ProductImageSerializer, ReviewSerializer
 )
+from apps.users.permissions import ProductAccessPermission, ReviewAccessPermission
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [ReviewAccessPermission]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -27,6 +28,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [ProductAccessPermission]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -62,11 +64,12 @@ class ProductViewSet(viewsets.ModelViewSet):
 class ProductVariantViewSet(viewsets.ModelViewSet):
     queryset = ProductVariant.objects.all()
     serializer_class = ProductVariantSerializer
+    permission_classes = [ProductAccessPermission]
 
 class ProductImageViewSet(viewsets.ModelViewSet):
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
-    # parser_classes dihapus karena sekarang hanya menerima JSON (URL string)
+    permission_classes = [ProductAccessPermission]
 
     @action(detail=True, methods=['post'])
     def set_primary(self, request, pk=None):

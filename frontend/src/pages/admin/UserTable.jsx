@@ -1,7 +1,7 @@
 import { ShieldCheck, UserCheck, UserX, Users } from 'lucide-react';
 import TableRowSkeleton from '../../components/ui/skeletons/TableRowSkeleton';
 
-export default function UserTable({ loading, users, togglingId, onToggleActive }) {
+export default function UserTable({ loading, users, togglingId, onToggleActive, onRoleChange }) {
   return (
     <div className="flex-1 overflow-auto">
       <table className="w-full text-left text-sm border-collapse">
@@ -33,19 +33,22 @@ export default function UserTable({ loading, users, togglingId, onToggleActive }
               <td className="px-6 py-4 font-bold">{u.username}</td>
               <td className="px-6 py-4 text-black/60 font-medium text-sm">{u.email || <span className="opacity-30">—</span>}</td>
               <td className="px-6 py-4">
-                {u.is_superuser ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-purple-50 text-purple-600 border border-purple-200 px-2.5 py-1 rounded-full uppercase tracking-widest">
-                    <ShieldCheck size={10} /> Superadmin
-                  </span>
-                ) : u.is_staff ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full uppercase tracking-widest">
-                    <ShieldCheck size={10} /> Staff
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-black/5 text-black/50 px-2.5 py-1 rounded-full uppercase tracking-widest">
-                    <UserCheck size={10} /> User
-                  </span>
-                )}
+                <select
+                  value={u.is_superuser ? 'superadmin' : u.is_staff ? 'staff' : 'customer'}
+                  onChange={(e) => onRoleChange(u, e.target.value)}
+                  disabled={togglingId === `role-${u.id}` || u.is_superuser && u.id === users.find(usr => usr.is_superuser)?.id}
+                  className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full outline-none transition-colors border ${
+                    u.is_superuser 
+                      ? 'bg-purple-50 text-purple-600 border-purple-200 focus:border-purple-400' 
+                      : u.is_staff 
+                        ? 'bg-blue-50 text-blue-600 border-blue-200 focus:border-blue-400'
+                        : 'bg-black/5 text-black/50 border-transparent focus:border-black/20'
+                  }`}
+                >
+                  <option value="customer">Customer</option>
+                  <option value="staff">Admin/Staff</option>
+                  <option value="superadmin">Superadmin</option>
+                </select>
               </td>
               <td className="px-6 py-4">
                 {u.is_active ? (

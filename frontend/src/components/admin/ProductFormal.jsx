@@ -25,7 +25,7 @@ const flatToGroups = (variants = []) => {
   return Object.values(map).length ? Object.values(map) : [{ color: '', sizes: [emptySize()] }];
 };
 
-export default function ProductFormal({ product = null, onClose }) {
+export default function ProductFormal({ product = null, onClose, isSuperAdmin }) {
   const queryClient = useQueryClient();
   const isEdit = !!product;
   const { upload: uploadToCloudinary } = useCloudinaryUpload();
@@ -167,21 +167,24 @@ export default function ProductFormal({ product = null, onClose }) {
           </div>
 
           <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-8 pb-10 space-y-7 no-scrollbar">
-            <ProductInfoSection form={form} setForm={setForm} />
+            <ProductInfoSection form={form} setForm={setForm} isSuperAdmin={isSuperAdmin} />
 
             <PhotoSection 
               existingImages={existingImages} newFiles={newFiles} primaryExistingId={primaryExistingId} 
               fileInputRef={fileInputRef} onFileSelect={handleFileSelect} onRemoveExisting={handleRemoveExistingImage} 
               onRemoveNew={idx => setNewFiles(prev => prev.filter((_, i) => i !== idx))}
               onSetExistingPrimary={handleSetExistingPrimary} onSetNewPrimary={handleSetNewPrimary}
+              isSuperAdmin={isSuperAdmin}
             />
 
             <section className="space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-black uppercase tracking-widest opacity-30">Variants by Color</p>
-                <button type="button" onClick={() => setGroups(prev => [...prev, emptyGroup()])} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest bg-black text-white px-3 py-1.5 rounded-full hover:bg-black/80 transition-colors">
-                  <Plus size={11} /> Add Color
-                </button>
+                {isSuperAdmin && (
+                  <button type="button" onClick={() => setGroups(prev => [...prev, emptyGroup()])} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest bg-black text-white px-3 py-1.5 rounded-full hover:bg-black/80 transition-colors">
+                    <Plus size={11} /> Add Color
+                  </button>
+                )}
               </div>
               <div className="space-y-3">
                 {groups.map((group, gIdx) => (
@@ -189,6 +192,7 @@ export default function ProductFormal({ product = null, onClose }) {
                     key={gIdx} group={group} groupIndex={gIdx} totalGroups={groups.length}
                     onChange={handleGroupColorChange} onRemoveGroup={() => setGroups(prev => prev.filter((_, i) => i !== gIdx))}
                     onAddSize={handleSizeField} onRemoveSize={handleRemoveSize}
+                    isSuperAdmin={isSuperAdmin}
                   />
                 ))}
               </div>

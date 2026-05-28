@@ -7,10 +7,12 @@ import StatusBadge, { STATUS_CONFIG } from '../../components/admin/orders/Status
 import OrderDetailPanel from '../../components/admin/orders/OrderDetailPanel';
 import OrderTable from '../../components/admin/orders/OrderTable';
 import { exportOrdersXlsx } from '../../utils/exportXlsx';
+import useAuthStore from '../../store/useAuthStore';
 
 const STATUS_OPTIONS = ['all', 'pending', 'paid', 'shipped', 'failed'];
 
 export default function OrderManager() {
+  const { user } = useAuthStore();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -76,12 +78,14 @@ export default function OrderManager() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-black tracking-tighter">Orders</h1>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => exportOrdersXlsx(filtered)}
-              className="flex items-center gap-2 bg-brand-bg px-4 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black/10 transition-colors"
-            >
-              <FileSpreadsheet size={14} /> Export
-            </button>
+            {user?.is_superuser && (
+              <button
+                onClick={() => exportOrdersXlsx(filtered)}
+                className="flex items-center gap-2 bg-brand-bg px-4 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black/10 transition-colors border border-black/5"
+              >
+                <FileSpreadsheet size={14} /> Export
+              </button>
+            )}
             <button
               onClick={fetchOrders}
               className="flex items-center gap-2 bg-brand-bg px-4 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black/10 transition-colors"

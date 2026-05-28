@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Palette, Trash2, ChevronDown, Plus } from 'lucide-react';
 import { inputCls } from './Field';
 
-export default function ColorGroup({ group, groupIndex, totalGroups, onChange, onRemoveGroup, onAddSize, onRemoveSize }) {
+export default function ColorGroup({ group, groupIndex, totalGroups, onChange, onRemoveGroup, onAddSize, onRemoveSize, isSuperAdmin }) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -20,10 +20,11 @@ export default function ColorGroup({ group, groupIndex, totalGroups, onChange, o
           value={group.color}
           onChange={(e) => onChange(groupIndex, 'color', e.target.value)}
           placeholder="Color name (e.g. Black)"
-          className="flex-1 bg-transparent text-xs font-black uppercase tracking-widest outline-none placeholder:opacity-30 placeholder:normal-case placeholder:tracking-normal"
+          disabled={!isSuperAdmin}
+          className="flex-1 bg-transparent text-xs font-black uppercase tracking-widest outline-none placeholder:opacity-30 placeholder:normal-case placeholder:tracking-normal disabled:opacity-50"
         />
         <div className="flex items-center gap-1 ml-auto">
-          {totalGroups > 1 && (
+          {isSuperAdmin && totalGroups > 1 && (
             <button
               type="button"
               onClick={() => onRemoveGroup(groupIndex)}
@@ -67,6 +68,7 @@ export default function ColorGroup({ group, groupIndex, totalGroups, onChange, o
                     onChange={(e) => onAddSize(groupIndex, sIndex, 'size', e.target.value)}
                     required
                     placeholder="42"
+                    disabled={!isSuperAdmin}
                     className={inputCls}
                   />
                   <input
@@ -85,24 +87,28 @@ export default function ColorGroup({ group, groupIndex, totalGroups, onChange, o
                     placeholder="0"
                     className={inputCls}
                   />
-                  <button
-                    type="button"
-                    onClick={() => onRemoveSize(groupIndex, sIndex)}
-                    disabled={group.sizes.length === 1}
-                    className="p-1.5 hover:bg-red-50 rounded-full transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
-                  >
-                    <Trash2 size={12} className="text-red-400" />
-                  </button>
+                  {isSuperAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => onRemoveSize(groupIndex, sIndex)}
+                      disabled={group.sizes.length === 1}
+                      className="p-1.5 hover:bg-red-50 rounded-full transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                    >
+                      <Trash2 size={12} className="text-red-400" />
+                    </button>
+                  )}
                 </div>
               ))}
 
-              <button
-                type="button"
-                onClick={() => onAddSize(groupIndex, null)}
-                className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest opacity-40 hover:opacity-80 transition-opacity mt-1 pl-1"
-              >
-                <Plus size={11} /> Add size
-              </button>
+              {isSuperAdmin && (
+                <button
+                  type="button"
+                  onClick={() => onAddSize(groupIndex, null)}
+                  className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest opacity-40 hover:opacity-80 transition-opacity mt-1 pl-1"
+                >
+                  <Plus size={11} /> Add size
+                </button>
+              )}
             </div>
           </motion.div>
         )}
