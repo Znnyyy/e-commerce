@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ShieldCheck, UserCheck, RefreshCw, Users, FileSpreadsheet } from 'lucide-react';
+import { Search, ShieldCheck, UserCheck, RefreshCw, Users, FileSpreadsheet, UserPlus, X, Loader2 } from 'lucide-react';
 import api from '../../api/axios';
 import TableRowSkeleton from '../../components/ui/skeletons/TableRowSkeleton';
 import toast from 'react-hot-toast';
@@ -13,6 +13,9 @@ export default function UserManager() {
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState('all');
   const [togglingId, setTogglingId] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newUser, setNewUser] = useState({ username: '', email: '', password: '', role: 'customer' });
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -43,18 +46,19 @@ export default function UserManager() {
     }
   };
 
-  const handleRoleChange = async (user, newRole) => {
-    setTogglingId(`role-${user.id}`);
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    setCreating(true);
     try {
-      const res = await api.patch(`/users/list/${user.id}/`, { role: newRole });
-      setUsers(prev => prev.map(u =>
-        u.id === user.id ? { ...u, is_staff: res.data.is_staff, is_superuser: res.data.is_superuser } : u
-      ));
-      toast.success(`Role updated to ${newRole}`);
+      await api.post('/users/list/', newUser);
+      toast.success('User created successfully');
+      setShowCreateModal(false);
+      setNewUser({ username: '', email: '', password: '', role: 'customer' });
+      fetchUsers();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to update user role');
+      toast.error(err.response?.data?.error || 'Failed to create user');
     } finally {
-      setTogglingId(null);
+      setCreating(false);
     }
   };
 
@@ -87,6 +91,12 @@ export default function UserManager() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 bg-black text-white px-4 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black/80 transition-colors"
+          >
+            <UserPlus size={14} /> Create User
+          </button>
           <button
             onClick={() => exportUsersXlsx(filtered)}
             className="flex items-center gap-2 bg-white border border-black/10 px-4 py-2.5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black/5 transition-colors"
@@ -148,9 +158,80 @@ export default function UserManager() {
           users={filtered}
           togglingId={togglingId}
           onToggleActive={handleToggleActive}
-          onRoleChange={handleRoleChange}
         />
       </div>
+
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative"
+          >
+            <button
+              onClick={() => setShowCreateModal(false)}
+              className="absolute top-6 right-6 opacity-40 hover:opacity-100 transition-opacity"
+            >
+              <X size={20} />
+            </button>
+            <h2 className="text-2xl font-black uppercase tracking-tighter mb-6">Create User</h2>
+            <form onSubmit={handleCreateUser} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest opacity-50 mb-2">Username</label>
+                <input
+                  type="text"
+                  required
+                  value={newUser.username}
+                  onChange={e => setNewUser({ ...newUser, username: e.target.value })}
+                  className="w-full border border-black/20 px-4 py-3 focus:outline-none focus:border-black transition-colors"
+                  placeholder="Username"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest opacity-50 mb-2">Email</label>
+                <input
+                  type="email"
+                  required
+                  value={newUser.email}
+                  onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+                  className="w-full border border-black/20 px-4 py-3 focus:outline-none focus:border-black transition-colors"
+                  placeholder="user@example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest opacity-50 mb-2">Password</label>
+                <input
+                  type="password"
+                  required
+                  value={newUser.password}
+                  onChange={e => setNewUser({ ...newUser, password: e.target.value })}
+                  className="w-full border border-black/20 px-4 py-3 focus:outline-none focus:border-black transition-colors"
+                  placeholder="Password"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest opacity-50 mb-2">Role</label>
+                <select
+                  value={newUser.role}
+                  onChange={e => setNewUser({ ...newUser, role: e.target.value })}
+                  className="w-full border border-black/20 px-4 py-3 focus:outline-none focus:border-black transition-colors"
+                >
+                  <option value="customer">Customer</option>
+                  <option value="staff">Admin / Staff</option>
+                  <option value="superadmin">Superadmin</option>
+                </select>
+              </div>
+              <button
+                type="submit"
+                disabled={creating}
+                className="w-full mt-4 bg-black text-white font-bold uppercase tracking-widest py-4 hover:bg-black/80 transition-colors disabled:opacity-50 flex items-center justify-center gap-3"
+              >
+                {creating ? <><Loader2 size={18} className="animate-spin" /> Creating...</> : 'Create User'}
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </motion.div>
   );
 }

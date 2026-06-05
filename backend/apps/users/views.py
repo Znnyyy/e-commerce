@@ -40,6 +40,39 @@ class UserListView(APIView):
         )
         return Response(list(users))
 
+    def post(self, request):
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
+        role = request.data.get('role', 'customer')
+
+        if not username or not password:
+            return Response({'error': 'Username and password are required'}, status=400)
+
+        if User.objects.filter(username=username).exists():
+            return Response({'error': 'Username already exists'}, status=400)
+
+        user = User.objects.create_user(username=username, email=email, password=password)
+        
+        if role == 'superadmin':
+            user.is_staff = True
+            user.is_superuser = True
+        elif role == 'staff' or role == 'admin':
+            user.is_staff = True
+            user.is_superuser = False
+        else:
+            user.is_staff = False
+            user.is_superuser = False
+            
+        user.save()
+        return Response({
+            'id': user.id, 
+            'username': user.username,
+            'is_active': user.is_active,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser
+        }, status=201)
+
     def patch(self, request, pk):
         try:
             user = User.objects.get(pk=pk)

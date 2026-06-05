@@ -2,8 +2,13 @@ import React from 'react';
 import { formatRupiah } from '../../utils/format';
 import { ShoppingBag } from 'lucide-react';
 
-export default function CheckoutSummary({ cart }) {
+export default function CheckoutSummary({ cart, user, usePoints, setUsePoints }) {
   if (!cart || !cart.items) return null;
+  
+  const userPoints = user?.profile?.points || 0;
+  const maxUsablePoints = Math.min(userPoints, cart.total);
+  const totalAfterPoints = Math.max(0, cart.total - usePoints);
+  const pointsEarned = Math.floor(totalAfterPoints * 0.05);
 
   return (
     <div className="bg-[#f4f4f4] p-8 rounded-3xl">
@@ -41,13 +46,46 @@ export default function CheckoutSummary({ cart }) {
           <span className="opacity-60">Subtotal</span>
           <span className="font-bold">{formatRupiah(cart.total)}</span>
         </div>
+        
+        {userPoints > 0 && (
+          <div className="py-4 border-y border-black/10 my-4">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <p className="text-sm font-bold">Use Points</p>
+                <p className="text-[10px] opacity-50 uppercase tracking-widest font-bold">Available: {formatRupiah(userPoints)}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setUsePoints(usePoints > 0 ? 0 : maxUsablePoints)}
+                className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full transition-colors border ${
+                  usePoints > 0 
+                    ? 'bg-black text-white border-black hover:bg-black/80' 
+                    : 'bg-white text-black border-black/20 hover:border-black'
+                }`}
+              >
+                {usePoints > 0 ? 'Cancel' : 'Apply Points'}
+              </button>
+            </div>
+            {usePoints > 0 && (
+              <div className="flex justify-between text-sm text-red-500 font-bold">
+                <span>Points Discount</span>
+                <span>-{formatRupiah(usePoints)}</span>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex justify-between text-sm">
           <span className="opacity-60">Shipping</span>
           <span className="font-bold text-green-600">Free</span>
         </div>
         <div className="flex justify-between text-xl font-black pt-4 border-t border-black/10 mt-4">
           <span>Total</span>
-          <span>{formatRupiah(cart.total)}</span>
+          <span>{formatRupiah(totalAfterPoints)}</span>
+        </div>
+        <div className="flex justify-between text-xs text-green-600 font-bold bg-green-50 p-3 rounded-xl mt-2">
+          <span>Points to Earn (5%)</span>
+          <span>+{formatRupiah(pointsEarned)}</span>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import useCartStore from '../../store/useCartStore';
+import useAuthStore from '../../store/useAuthStore';
 import { CreditCard, Loader2 } from 'lucide-react';
 import api from '../../api/axios';
 import toast from 'react-hot-toast';
@@ -12,8 +13,10 @@ const LABEL_STYLES = 'block text-xs font-bold uppercase tracking-widest opacity-
 
 export default function Checkout() {
   const { cart, clearAll } = useCartStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [usePoints, setUsePoints] = useState(0);
   const [formData, setFormData] = useState({
     shipping_name: '',
     shipping_address: '',
@@ -30,7 +33,8 @@ export default function Checkout() {
     setLoading(true);
 
     try {
-      const response = await api.post('/orders/', formData);
+      const payload = { ...formData, use_points: usePoints };
+      const response = await api.post('/orders/', payload);
       const orderData = response.data;
 
       if (!orderData.snap_token) {
@@ -103,7 +107,7 @@ export default function Checkout() {
         </div>
 
         <div className="lg:col-span-5">
-          <CheckoutSummary cart={cart} />
+          <CheckoutSummary cart={cart} user={user} usePoints={usePoints} setUsePoints={setUsePoints} />
         </div>
       </div>
     </motion.div>

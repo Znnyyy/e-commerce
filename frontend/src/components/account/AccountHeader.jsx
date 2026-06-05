@@ -1,6 +1,7 @@
 import React from "react";
-import { User, ShieldCheck, Mail, Edit2, Package, CreditCard, Box, Calendar } from "lucide-react";
+import { User, ShieldCheck, Mail, Edit2, Package, CreditCard, Box, Calendar, Coins } from "lucide-react";
 import { getImageUrl } from "../../api/axios";
+import { formatRupiah } from "../../utils/format";
 import StatBox from "./StatBox";
 
 export default function AccountHeader({ user, orders, totalSpent, totalItems, onEditClick }) {
@@ -50,7 +51,8 @@ export default function AccountHeader({ user, orders, totalSpent, totalItems, on
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-6 border-t border-black/5 pt-8 relative z-10">
+      <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 border-t border-black/5 pt-8 relative z-10">
+        <StatBox label="Points Balance" value={user?.profile?.points ? formatRupiah(user.profile.points) : 'Rp 0'} icon={Coins} />
         <StatBox label="Total Orders" value={orders.length} icon={Package} />
         <StatBox label="Total Spent" value={totalSpent} icon={CreditCard} />
         <StatBox label="Items Bought" value={totalItems} icon={Box} />

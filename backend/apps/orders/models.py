@@ -15,6 +15,8 @@ class Order(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     snap_token = models.CharField(max_length=500, blank=True, null=True)
     midtrans_order_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    points_used = models.IntegerField(default=0)
+    points_earned = models.IntegerField(default=0)
     
     # Shipping details
     shipping_name = models.CharField(max_length=255)

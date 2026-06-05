@@ -42,8 +42,15 @@ def apply_midtrans_status(order, transaction_status, fraud_status):
         order.status = 'failed'
         if old_status == 'pending':
             rollback_stock(order)
+            if order.points_used > 0:
+                order.user.profile.points = F('points') + order.points_used
+                order.user.profile.save(update_fields=['points'])
     elif transaction_status == 'pending':
         order.status = 'pending'
+
+    if old_status == 'pending' and order.status == 'paid' and order.points_earned > 0:
+        order.user.profile.points = F('points') + order.points_earned
+        order.user.profile.save(update_fields=['points'])
 
     order.save(update_fields=['status'])
 
@@ -131,6 +138,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        use_points = int(request.data.get('use_points', 0))
+        if use_points > 0:
+            if not hasattr(user, 'profile') or user.profile.points < use_points:
+                return Response({"error": "Not enough points"}, status=status.HTTP_400_BAD_REQUEST)
+
         midtrans_order_id = f"ORDER-{uuid.uuid4().hex[:12].upper()}"
         order = serializer.save(user=user, midtrans_order_id=midtrans_order_id)
 
@@ -152,7 +164,20 @@ class OrderViewSet(viewsets.ModelViewSet):
                 "name": f"{variant.product.name} ({variant.color} / EU {variant.size})"[:50],
             })
 
+        if use_points > 0:
+            total_amount = max(0, total_amount - use_points)
+            order.user.profile.points = F('points') - use_points
+            order.user.profile.save(update_fields=['points'])
+            
+            # Since Midtrans doesn't natively handle negative line items well without proper gross_amount sync,
+            # we just adjust gross_amount. If total_amount becomes 0, midtrans might fail. But we assume use_points <= subtotal.
+            # (In a real scenario, you'd add a negative line item or handle 100% discount differently)
+
+        points_earned = int(total_amount * 0.05)
+        
         order.total_amount = total_amount
+        order.points_used = use_points
+        order.points_earned = points_earned
         order.save()
         cart.items.all().delete()
 

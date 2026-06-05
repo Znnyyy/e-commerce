@@ -4,9 +4,10 @@ from .models import UserProfile
 
 class UserProfileSerializer(serializers.ModelSerializer):
     avatar = serializers.URLField(read_only=True)
+    points = serializers.IntegerField(read_only=True)
     class Meta:
         model = UserProfile
-        fields = ('avatar',)
+        fields = ('avatar', 'points')
 
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only=True)
